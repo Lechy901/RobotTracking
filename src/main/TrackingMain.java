@@ -1,4 +1,4 @@
-package base;
+package main;
 
 import org.bytedeco.javacv.*;
 
