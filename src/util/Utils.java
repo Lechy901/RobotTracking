@@ -41,7 +41,7 @@ public class Utils {
         
     }
 	
-	public static void scaleImageToFit(Mat image, Mat output) {
+	public static Mat scaleImageToFit(Mat image, Mat output) {
 		List<List<Point>> squares = new ArrayList<List<Point>>();
 		findSquares(new Mat(image), squares);
 		List<Point> biggestSquare;
@@ -49,7 +49,7 @@ public class Utils {
 			biggestSquare = getBiggestSquare(squares);
 		} catch (IllegalArgumentException ex) {
 			System.out.println("no squares");
-			return;
+			return null;
 		}
 		biggestSquare = sortSquareClockWise(biggestSquare);
 	    for (Point p : biggestSquare) {
@@ -69,7 +69,7 @@ public class Utils {
 	    Mat transformation = getPerspectiveTransform(srcMat, toMat);
 	    
 	    warpPerspective(image, output, transformation, new Size(image.cols(), image.rows()));
-
+	    return transformation;
 	}
 	
 	public static Point lineIntersection(Pair<Point, Point> line1, Pair<Point, Point> line2) throws Exception {
@@ -89,6 +89,10 @@ public class Utils {
 		int y = det(d1, d2, y1diff, y2diff) / div;
 		
 		return new Point(x, y);
+	}
+	
+	public static double getDist(Point p1, Point p2) {
+		return Math.sqrt((p1.x() - p2.x()) * (p1.x() - p2.x()) + (p1.y() - p2.y()) * (p1.y() - p2.y()));
 	}
 	
 	private static int det(int x1, int x2, int y1, int y2) {

@@ -14,9 +14,9 @@ import util.Direction;
 import util.Utils;
 
 public class GraphFinder {
-	public void findGraph(Mat input) {
+	public Mat findGraph(Mat input) {
 		Mat scaled = new Mat();
-		Utils.scaleImageToFit(input, scaled);
+		Mat transformation = Utils.scaleImageToFit(input, scaled);
 		
 		Mat gray = new Mat();
 		cvtColor(scaled, gray, COLOR_BGR2GRAY);
@@ -108,7 +108,6 @@ public class GraphFinder {
 							endVertices.add(new EndVertex(new Point(j + (edgeSquareSide / 2), i + (edgeSquareSide / 2)), Direction.DOWN));
 						}
 						
-						
 						// BFS to color neighboring gray pixels black
 						Queue<Integer> q = new LinkedList<Integer>();
 						q.add(j);
@@ -146,6 +145,8 @@ public class GraphFinder {
 		Utils.display(edges, "graphDetected");
 		System.out.println(endVertices.size());
 		ImageGraph ig = new ImageGraph(endVertices);
+		
+		return transformation;
 	}
 	
 }

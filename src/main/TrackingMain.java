@@ -48,7 +48,7 @@ public class TrackingMain {
 		Utils.display(frame, "new webcam frame");
 		System.out.println(frame);
 		GraphFinder gf = new GraphFinder();
-		gf.findGraph(frame);
+		Mat transformation = gf.findGraph(frame);
 		
 		if (!loadFromStorage)
 			vc.close();

@@ -8,9 +8,9 @@ import org.bytedeco.javacpp.opencv_core.Point;
 
 import util.Direction;
 import util.Pair;
+import util.Utils;
 
 public class ImageGraph {
-	private Mat image;
 	private Point[][] vertices;
 	
 	public ImageGraph(List<EndVertex> endVertices) {
@@ -27,8 +27,8 @@ public class ImageGraph {
 			Direction opposite = Direction.getOpposite(e.getDir());
 			
 			EndVertex nearestOpposite = endVertices.stream().filter(x -> x.getDir() == opposite).min((a, b) -> {
-				double aDist = Math.sqrt((a.getPoint().x() - e.getPoint().x()) * (a.getPoint().x() - e.getPoint().x()) + (a.getPoint().y() - e.getPoint().y()) * (a.getPoint().y() - e.getPoint().y()));
-				double bDist = Math.sqrt((b.getPoint().x() - e.getPoint().x()) * (b.getPoint().x() - e.getPoint().x()) + (b.getPoint().y() - e.getPoint().y()) * (b.getPoint().y() - e.getPoint().y()));
+				double aDist = Utils.getDist(a.getPoint(), e.getPoint());
+				double bDist = Utils.getDist(b.getPoint(), e.getPoint());
 				if (aDist < bDist)
 					return -1;
 				if (aDist > bDist)
@@ -48,9 +48,23 @@ public class ImageGraph {
 		vertices = new Point[horizontal.size() + 2][vertical.size() + 2];
 		
 		for(int i = 0; i < horizontal.size(); i++) {
-			for(int j = 0; j < vertical.size(); j++) {
-				//TODO
+			vertices[i+1][0] = horizontal.get(i).first;
+			vertices[i+1][vertices[i].length - 1] = horizontal.get(i).second;
+		}
+		
+		for(int i = 0; i < vertical.size(); i++) {
+			vertices[0][i+1] = vertical.get(i).first;
+			vertices[vertices.length - 1][i+1] = vertical.get(i).second;
+		}
+		try {
+			for(int i = 0; i < horizontal.size(); i++) {
+				for(int j = 0; j < vertical.size(); j++) {
+					vertices[i+1][j+1] = Utils.lineIntersection(horizontal.get(i), vertical.get(j));
+				}
 			}
+		} catch(Exception ex) {
+			System.out.println("There are lines which do not intersect");
+			ex.printStackTrace();
 		}
 	}
 }
