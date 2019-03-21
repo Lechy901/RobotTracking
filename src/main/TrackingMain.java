@@ -1,12 +1,10 @@
 package main;
 
-import org.bytedeco.javacv.*;
-
 import base.*;
+import img_utils.ImageUtils;
 import util.Utils;
 
 import static org.bytedeco.javacpp.opencv_core.*;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
 import static org.bytedeco.javacpp.opencv_videoio.*;
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
@@ -17,8 +15,25 @@ public class TrackingMain {
 
 	public static void main(String[] args) {
 		
+		boolean generateBgFile = true;
+		boolean convertImages = false;
+		boolean downloadImages = false;
+		
 		boolean loadFromStorage = true;
 		System.out.println("hello");
+		
+		if (generateBgFile) {
+			ImageUtils.generateBgFile("img");
+			return;
+		}
+		if (convertImages) {
+			ImageUtils.convertImagesFromStorage("my_img");
+			return;
+		}
+		if (downloadImages) {
+			ImageUtils.loadAndConvertImagesFromURLs("paper-images");
+			return;
+		}
 		
 		Mat frame = new Mat();
 		VideoCapture vc = null;

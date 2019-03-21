@@ -1,0 +1,5 @@
+opencv_createsamples -img pos50x50.jpg -bg bg.txt -info info/info.lst -pngoutput info -maxxangle 0.5 -maxyangle -0.5 -maxzangle 0.5 -num 2050 -bgcolor 240 -bgthresh 15
+
+opencv_createsamples -info info/info.lst -num 2050 -w 50 -h 50 -vec positives.vec
+
+opencv_traincascade -data data -vec positives.vec -bg bg.txt -numPos 1850 -numNeg 925 -numStages 10 -w 50 -h 50
