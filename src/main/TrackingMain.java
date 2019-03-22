@@ -1,7 +1,7 @@
 package main;
 
 import base.*;
-import img_utils.ImageUtils;
+import training_utils.ImageUtils;
 import util.Utils;
 
 import static org.bytedeco.javacpp.opencv_core.*;

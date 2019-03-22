@@ -1,4 +1,4 @@
-package img_utils;
+package training_utils;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
