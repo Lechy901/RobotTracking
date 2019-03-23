@@ -16,10 +16,10 @@ public class TrackingMain {
 
 	public static void main(String[] args) {
 		
-		boolean trackTest = true;
 		boolean generateBgFile = false;
 		boolean convertImages = false;
 		boolean downloadImages = false;
+		boolean trackTest = true;
 				
 		boolean loadFromStorage = false;
 		System.out.println("hello");

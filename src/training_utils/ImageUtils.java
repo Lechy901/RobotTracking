@@ -59,7 +59,7 @@ public class ImageUtils {
 	public static void convertImagesFromStorage(String dirpath) {
 		File dir = new File(dirpath);
 		File[] contents = dir.listFiles();
-		int i = 2051;
+		int i = 1;
 		for(File f : contents) {
 			System.out.println("processing " + f.getName());
 			
@@ -67,7 +67,7 @@ public class ImageUtils {
 			Mat resized = new Mat();
 			resize(img, resized, new Size(100, 100));
 			
-			imwrite(i + ".jpg", resized);
+			imwrite("a" + i + ".jpg", resized);
 			i++;
 			System.out.println("done");
 		}
