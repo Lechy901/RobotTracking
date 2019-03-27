@@ -64,7 +64,7 @@ public class TrackingMain {
 		}
 		
 		if (trackTest) {
-			RobotTracker rt = new RobotTracker("data/01/cascade.xml");
+			RobotTracker rt = new RobotTracker("data/cascade.xml");
 			Mat gray = new Mat();
 			cvtColor(frame, gray, CV_BGR2GRAY);
 			Rect[] r = rt.findRobots(gray);
