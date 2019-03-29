@@ -2,6 +2,7 @@ package main;
 
 import base.*;
 import training_utils.ImageUtils;
+import training_utils.TestImageCapturer;
 import util.Utils;
 
 import static org.bytedeco.javacpp.opencv_core.*;
@@ -16,14 +17,21 @@ public class TrackingMain {
 
 	public static void main(String[] args) {
 		
+		boolean captureTestImages = true;
 		boolean generateBgFile = false;
 		boolean convertImages = false;
 		boolean downloadImages = false;
-		boolean trackTest = true;
+		boolean trackTest = false;
 				
 		boolean loadFromStorage = false;
 		System.out.println("hello");
 		
+		
+		if (captureTestImages) {
+			TestImageCapturer vcr = new TestImageCapturer("imgs_with_robots");
+			vcr.start();
+			return;
+		}
 		if (generateBgFile) {
 			ImageUtils.generateBgFile("img");
 			return;
@@ -64,9 +72,11 @@ public class TrackingMain {
 		}
 		
 		if (trackTest) {
-			RobotTracker rt = new RobotTracker("data/cascade.xml");
-			Mat gray = new Mat();
+			RobotTracker rt = new RobotTracker("data/02/cascade.xml");
+			Mat gray = new Mat(), normalized = new Mat();
+			normalize(frame, normalized);
 			cvtColor(frame, gray, CV_BGR2GRAY);
+			Utils.display(gray, "norm");
 			Rect[] r = rt.findRobots(gray);
 			for(Rect rr : r) {
 				rectangle(frame, rr, new Scalar(255, 255, 255, 255));
