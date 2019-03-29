@@ -17,17 +17,17 @@ public class TrackingMain {
 
 	public static void main(String[] args) {
 		
-		boolean captureTestImages = true;
+		boolean captureTrainImages = false;
 		boolean generateBgFile = false;
 		boolean convertImages = false;
 		boolean downloadImages = false;
-		boolean trackTest = false;
+		boolean trackTest = true;
 				
 		boolean loadFromStorage = false;
 		System.out.println("hello");
 		
 		
-		if (captureTestImages) {
+		if (captureTrainImages) {
 			TestImageCapturer vcr = new TestImageCapturer("imgs_with_robots");
 			vcr.start();
 			return;
@@ -60,7 +60,7 @@ public class TrackingMain {
 			}
 			System.out.println("VideoCapture opened successfully");
 			System.out.println("Starting to grab frames");
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 30; i++) {
 				vc.read(frame);
 				if (frame.empty()) {
 					System.out.println("empty frame grabbed wtf");
@@ -72,7 +72,7 @@ public class TrackingMain {
 		}
 		
 		if (trackTest) {
-			RobotTracker rt = new RobotTracker("data/02/cascade.xml");
+			RobotTracker rt = new RobotTracker("data/03/cascade.xml");
 			Mat gray = new Mat(), normalized = new Mat();
 			normalize(frame, normalized);
 			cvtColor(frame, gray, CV_BGR2GRAY);
