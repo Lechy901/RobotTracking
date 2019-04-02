@@ -3,6 +3,7 @@ package main;
 import base.*;
 import training_utils.ImageUtils;
 import training_utils.TestImageCapturer;
+import util.ImageWindow;
 import util.Utils;
 
 import static org.bytedeco.javacpp.opencv_core.*;
@@ -18,22 +19,22 @@ public class TrackingMain {
 	public static void main(String[] args) {
 		
 		boolean captureTrainImages = false;
-		boolean generateBgFile = false;
+		boolean generateBgFile = true;
 		boolean convertImages = false;
 		boolean downloadImages = false;
-		boolean trackTest = true;
+		boolean trackTest = false;
 				
 		boolean loadFromStorage = false;
 		System.out.println("hello");
 		
 		
 		if (captureTrainImages) {
-			TestImageCapturer vcr = new TestImageCapturer("imgs_with_robots");
-			vcr.start();
+			TestImageCapturer tic = new TestImageCapturer("bg");
+			tic.start();
 			return;
 		}
 		if (generateBgFile) {
-			ImageUtils.generateBgFile("img");
+			ImageUtils.generateBgFile("bg", "bg2.txt");
 			return;
 		}
 		if (convertImages) {
@@ -60,6 +61,7 @@ public class TrackingMain {
 			}
 			System.out.println("VideoCapture opened successfully");
 			System.out.println("Starting to grab frames");
+			ImageWindow d = new ImageWindow("test");
 			for (int i = 0; i < 30; i++) {
 				vc.read(frame);
 				if (frame.empty()) {
@@ -67,12 +69,13 @@ public class TrackingMain {
 					continue;
 				}
 				System.out.println("frame grabbed successfully");
+				d.showImage(frame);
 				//break;
 			}
 		}
 		
 		if (trackTest) {
-			RobotTracker rt = new RobotTracker("data/03/cascade.xml");
+			RobotTracker rt = new RobotTracker("data/04/cascade.xml");
 			Mat gray = new Mat(), normalized = new Mat();
 			normalize(frame, normalized);
 			cvtColor(frame, gray, CV_BGR2GRAY);

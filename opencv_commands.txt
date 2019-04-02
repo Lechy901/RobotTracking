@@ -5,3 +5,7 @@ opencv_createsamples -info info/info.lst -num 2050 -w 50 -h 50 -vec positives.ve
 opencv_traincascade -data data -vec positives.vec -bg bg.txt -numPos 1850 -numNeg 925 -numStages 10 -w 50 -h 50
 
 opencv_traincascade -data data -vec positives.vec -bg bg.txt -numPos 1750 -numNeg 1600 -numStages 10 -w 50 -h 50 -maxFalseAlarmRate 0.25
+
+opencv_createsamples -info annotations04.txt -num 1400 -w 40 -h 40 -vec positives.vec
+
+opencv_traincascade -data data -vec positives.vec -bg bg.txt -numPos 1350 -numNeg 1600 -numStages 10 -w 40 -h 40 -maxFalseAlarmRate 0.4

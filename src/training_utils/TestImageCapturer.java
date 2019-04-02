@@ -1,7 +1,5 @@
 package training_utils;
 
-import static org.bytedeco.javacpp.opencv_imgcodecs.IMREAD_GRAYSCALE;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
@@ -13,6 +11,7 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_videoio.VideoCapture;
 
+import util.ImageWindow;
 import util.Utils;
 
 public class TestImageCapturer {
@@ -26,15 +25,15 @@ public class TestImageCapturer {
 	}
 	
 	public void start() {
-		
-		vc.open(0);
+		ImageWindow iw = new ImageWindow("frames");
+		vc.open(1);
 		if (!vc.isOpened()) {
 			System.err.println("VideoCapture is not opened");
 			vc.close();
 			return;
 		}
-		int img_num = 530;
-		for(int i = 1; i < 660; i++) {
+		int img_num = 1365;
+		for(int i = 1; i < 2520; i++) {
 			Mat frame = new Mat();
 			vc.read(frame);
 			if (frame.empty()) {
@@ -42,16 +41,16 @@ public class TestImageCapturer {
 				vc.close();
 				return;
 			}
-			
-			if (i % 60 == 0) {
-				Utils.display(frame, "frame " + i);
+
+			iw.showImage(frame);
+			if (i % 45 == 0) {
 				System.out.println("writing image " + img_num);
-				Mat gray = new Mat(), resized = new Mat();
-				resize(frame, resized, new Size(100, 100));
-				cvtColor(resized, gray, CV_BGR2GRAY);
+				Mat gray = new Mat();
+				cvtColor(frame, gray, CV_BGR2GRAY);
 				imwrite(dir.getName() + "/" + img_num++ + ".jpg", gray);
 			}
 		}
 		System.out.println("done");
+		vc.close();
 	}
 }

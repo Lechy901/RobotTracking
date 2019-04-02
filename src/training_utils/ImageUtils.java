@@ -73,11 +73,11 @@ public class ImageUtils {
 		}
 	}
 	
-	public static void generateBgFile(String dirpath) {
+	public static void generateBgFile(String dirpath, String filename) {
 		try {
 			File dir = new File(dirpath);
 			File[] contents = dir.listFiles();
-			BufferedWriter bg = new BufferedWriter(new FileWriter("bg.txt"));
+			BufferedWriter bg = new BufferedWriter(new FileWriter(filename));
 			
 			for(File f : contents) {
 				bg.write(dirpath + "/" + f.getName() + "\n");
