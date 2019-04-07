@@ -4,6 +4,7 @@ import base.*;
 import training_utils.ImageUtils;
 import training_utils.TestImageCapturer;
 import util.ImageWindow;
+import util.Pair;
 import util.Utils;
 
 import static org.bytedeco.javacpp.opencv_core.*;
@@ -65,10 +66,41 @@ public class TrackingMain {
 			d.showImage(frame);
 		}
 		
-		RobotTracker rt = new RobotTracker("data/cascade.xml");
-		GraphFinder gf = new GraphFinder();
-		Mat transformation = gf.findGraph(frame);
+		//RobotTracker rt = new RobotTracker("data/06/cascade.xml");
+		//GraphFinder gf = new GraphFinder();
+		//Mat transformation = gf.findGraph(frame);
+		Mat output = new Mat();
+		Mat transformation = Utils.scaleImageToFit(frame, output);
 		
+		int iter = 0;
+		while(iter++ < 10 || !d.isSpacePressed()) {
+			vc.read(frame);
+			if (frame.empty()) {
+				System.out.println("empty frame grabbed");
+				continue;
+			}
+			Mat warped = new Mat();
+			warpPerspective(frame, warped, transformation, new Size(frame.cols(), frame.rows()));
+			List<Pair<Point, Point>> lines = Utils.getLines(warped);
+			List<Pair<Point, Point>> horizontal = new ArrayList<Pair<Point, Point>>();
+			List<Pair<Point, Point>> vertical = new ArrayList<Pair<Point, Point>>();
+			Utils.groupLines(lines, horizontal, vertical, 40);
+			for (Pair<Point, Point> line : horizontal) {
+				line(warped, line.first, line.second, new Scalar(0, 0, 255, 255), 3, 8, 0);
+			}
+			for (Pair<Point, Point> line : vertical) {
+				line(warped, line.first, line.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
+			}
+			
+			ImageGraph ig = new ImageGraph(horizontal, vertical);
+			for (Point vertex : ig.vertices) {
+				circle(warped, vertex, 8, new Scalar(0, 255, 0, 255));
+			}
+			
+			d.showImage(warped);
+		}		
+		
+		/*
 		while(true) {
 			vc.read(frame);
 			if (frame.empty()) {
@@ -87,6 +119,7 @@ public class TrackingMain {
 			d.showImage(gray);
 			
 		}
+		*/
 	}
 
 	private static void oldMain() {
@@ -163,9 +196,6 @@ public class TrackingMain {
 			return;
 		} 
 		Utils.display(frame, "new webcam frame");
-		System.out.println(frame);
-		GraphFinder gf = new GraphFinder();
-		Mat transformation = gf.findGraph(frame);
 		
 		if (!loadFromStorage)
 			vc.close();

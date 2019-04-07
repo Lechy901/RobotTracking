@@ -6,6 +6,7 @@ import static org.bytedeco.javacpp.opencv_imgproc.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.WindowConstants;
@@ -18,13 +19,167 @@ import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Point2f;
 import org.bytedeco.javacpp.opencv_core.PointVector;
 import org.bytedeco.javacpp.opencv_core.Scalar;
+import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.indexer.Indexer;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
 public class Utils {
 	
-	static Random rand = new Random();
+	public static Random rand = new Random();
+	
+	public static List<Pair<Point, Point>> getLines(Mat img) {
+		Mat gray = new Mat(), dilated = new Mat(), edges = new Mat(), lines = new Mat();
+		cvtColor(img, gray, CV_BGR2GRAY);
+		dilate(gray, dilated, new Mat(), new Point(-1,-1), 10, BORDER_CONSTANT, morphologyDefaultBorderValue());
+		//Utils.display(dilated, "edges");
+		Canny(dilated, edges, 50, 150, 3, false);
+		HoughLinesP(edges, lines, 1, Math.PI / 180, 40, 10, 0);
+		
+		List<Pair<Point, Point>> r = new ArrayList<Pair<Point, Point>>();
+		if (lines.isNull() || lines.rows() == 0)
+			return r;
+		
+		Indexer indexer = lines.createIndexer();		
+		
+		for (int i = 0; i < indexer.rows(); i++) {
+			r.add(new Pair<Point, Point>(new Point((int)indexer.getDouble(0, i, 0), (int)indexer.getDouble(0, i, 1)),
+											new Point((int)indexer.getDouble(0, i, 2), (int)indexer.getDouble(0, i, 3))));
+		}
+		return r;
+	}
+	
+	public static void groupLines(List<Pair<Point, Point>> input, List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, double threshold) {
+		
+		List<Pair<Point, Point>> horizontal_temp = new ArrayList<Pair<Point, Point>>();
+		List<Pair<Point, Point>> vertical_temp = new ArrayList<Pair<Point, Point>>();
+		
+		for(Pair<Point, Point> line : input) {
+			double lineAngle = angle(line.first, line.second, new Point(line.first.x() - 1, line.first.y()));
+			if (lineAngle < 0.1)
+				vertical_temp.add(line);
+			else if (lineAngle > 0.9)
+				horizontal_temp.add(line);
+		}
+		
+		vertical_temp.sort((a, b) -> {
+			return a.first.x() - b.first.x();
+		});
+		
+		int last_x = -1;
+		List<Pair<Point, Point>> temp = new ArrayList<Pair<Point, Point>>();
+		
+		for (int i = 0; i < vertical_temp.size(); i++) {
+			if (last_x == -1) {
+				// first vertical line in the first set
+				temp.add(vertical_temp.get(i));
+			} else {
+				if (vertical_temp.get(i).first.x() - last_x < threshold && i != vertical_temp.size() - 1) {
+					// another vertical line in the same set
+					temp.add(vertical_temp.get(i));
+				} else {
+					// first vertical line in another set
+					if (temp.size() >= 4) {
+						int min_y = Integer.MAX_VALUE;
+						int min_y_x = 0;
+						for (int j = 0; j < temp.size(); j++) {
+							if (temp.get(j).first.y() < min_y) {
+								min_y = temp.get(j).first.y();
+								min_y_x = temp.get(j).first.x();
+							}
+							if (temp.get(j).second.y() < min_y) {
+								min_y = temp.get(j).second.y();
+								min_y_x = temp.get(j).second.x();
+							}
+						}
+						int max_y = -1;
+						int max_y_x = 0;
+						for (int j = 0; j < temp.size(); j++) {
+							if (temp.get(j).first.y() > max_y) {
+								max_y = temp.get(j).first.y();
+								max_y_x = temp.get(j).first.x();
+							}
+							if (temp.get(j).second.y() > max_y) {
+								max_y = temp.get(j).second.y();
+								max_y_x = temp.get(j).second.x();
+							}
+						}
+						vertical.add(new Pair<Point, Point>(new Point(min_y_x, min_y), new Point(max_y_x, max_y)));
+					}
+					temp.clear();
+					temp.add(vertical_temp.get(i));
+				}
+			}
+			last_x = vertical_temp.get(i).first.x();
+		}
+		
+		horizontal_temp.sort((a, b) -> {
+			return a.first.y() - b.first.y();
+		});
+		
+		int last_y = -1;
+		temp = new ArrayList<Pair<Point, Point>>();
+		
+		for (int i = 0; i < horizontal_temp.size(); i++) {
+			if (last_y == -1) {
+				// first horizontal line in the first set
+				temp.add(horizontal_temp.get(i));
+			} else {
+				if (horizontal_temp.get(i).first.y() - last_y < threshold && i != horizontal_temp.size() - 1) {
+					// another horizontal line in the same set
+					temp.add(horizontal_temp.get(i));
+				} else {
+					// first horizontal line in another set
+					if (temp.size() >= 4) {
+						int min_x = Integer.MAX_VALUE;
+						int min_x_y = 0;
+						for (int j = 0; j < temp.size(); j++) {
+							if (temp.get(j).first.x() < min_x) {
+								min_x = temp.get(j).first.x();
+								min_x_y = temp.get(j).first.y();
+							}
+							if (temp.get(j).second.x() < min_x) {
+								min_x = temp.get(j).second.x();
+								min_x_y = temp.get(j).second.y();
+							}
+						}
+						int max_x = -1;
+						int max_x_y = 0;
+						for (int j = 0; j < temp.size(); j++) {
+							if (temp.get(j).first.x() > max_x) {
+								max_x = temp.get(j).first.x();
+								max_x_y = temp.get(j).first.y();
+							}
+							if (temp.get(j).second.x() > max_x) {
+								max_x = temp.get(j).second.x();
+								max_x_y = temp.get(j).second.y();
+							}
+						}
+						horizontal.add(new Pair<Point, Point>(new Point(min_x, min_x_y), new Point(max_x, max_x_y)));
+					}
+					temp.clear();
+					temp.add(horizontal_temp.get(i));
+				}
+			}
+			last_y = horizontal_temp.get(i).first.y();
+		}
+	}
+	
+	public static List<Point> groupPoints(List<Point> points, double threshold) {
+		List<Point> r = new ArrayList<Point>();
+		
+		while(!points.isEmpty()) {
+			Point cur = points.get(0);
+			
+			List<Point> nearby = points.stream().filter(x -> (getDist(cur, x) < threshold)).collect(Collectors.toList());
+			points.removeAll(nearby);
+			
+			r.add(new Point((int)nearby.stream().mapToInt(a -> a.x()).average().getAsDouble(),
+							(int)nearby.stream().mapToInt(a -> a.y()).average().getAsDouble()));
+		}
+		
+		return r;
+	}
 	
 	public static void display(Mat image, String caption) {
         // Create image window named "My Image".
@@ -72,7 +227,7 @@ public class Utils {
 	    return transformation;
 	}
 	
-	public static Point lineIntersection(Pair<Point, Point> line1, Pair<Point, Point> line2) throws Exception {
+	public static Point lineIntersection(Pair<Point, Point> line1, Pair<Point, Point> line2) throws NoIntersectionException {
 		int x1diff = line1.first.x() - line1.second.x();
 		int x2diff = line2.first.x() - line2.second.x();
 		int y1diff = line1.first.y() - line1.second.y();
@@ -80,7 +235,7 @@ public class Utils {
 		
 		int div = det(x1diff, x2diff, y1diff, y2diff);
 		if (div == 0)
-			throw new Exception("lines do not intersect");
+			throw new NoIntersectionException("lines do not intersect");
 		
 		int d1 = det(line1.first.x(), line1.first.y(), line1.second.x(), line1.second.y());
 		int d2 = det(line2.first.x(), line2.first.y(), line2.second.x(), line2.second.y());

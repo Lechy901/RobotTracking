@@ -21,6 +21,7 @@ public class ImageWindow {
         // Request closing of the application when the image window is closed.
         canvas.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
+        // Add a key listener for spacebar
         canvas.addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
