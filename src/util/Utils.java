@@ -99,7 +99,22 @@ public class Utils {
 		return x1 * y2 - x2 * y1;
 	}
 	
-	private static void findSquares(Mat image, List<List<Point>> squares) {
+	public static List<Point> getBiggestSquare(List<List<Point>> squares) throws IllegalArgumentException {
+		double maxArea = -1.0;
+		List<Point> maxAreaSquare = null;
+		for(List<Point> square : squares) {
+			double curSquareArea = getPolygonArea(square);
+			if (curSquareArea > maxArea) {
+				maxArea = curSquareArea;
+				maxAreaSquare = square;
+			}
+		}
+		if (maxAreaSquare == null)
+			throw new IllegalArgumentException();
+		return maxAreaSquare;
+	}
+	
+	public static void findSquares(Mat image, List<List<Point>> squares) {
 	    // blur will enhance edge detection
 	    Mat blurred = new Mat(image);
 	    medianBlur(image, blurred, 5);
@@ -184,22 +199,7 @@ public class Utils {
 	        }
 	    }        
 	}
-	
-	private static List<Point> getBiggestSquare(List<List<Point>> squares) throws IllegalArgumentException {
-		double maxArea = -1.0;
-		List<Point> maxAreaSquare = null;
-		for(List<Point> square : squares) {
-			double curSquareArea = getPolygonArea(square);
-			if (curSquareArea > maxArea) {
-				maxArea = curSquareArea;
-				maxAreaSquare = square;
-			}
-		}
-		if (maxAreaSquare == null)
-			throw new IllegalArgumentException();
-		return maxAreaSquare;
-	}
-	
+		
 	private static double getPolygonArea(List<Point> square) {
 		double max = -1.0;
 		

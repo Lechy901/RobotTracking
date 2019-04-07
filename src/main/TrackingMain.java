@@ -14,19 +14,90 @@ import static org.bytedeco.javacpp.opencv_imgproc.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bytedeco.javacpp.opencv_core.Size;
+
 public class TrackingMain {
 
 	public static void main(String[] args) {
+		boolean old = false;
 		
+		if(old) {
+			oldMain();
+			return;
+		}
+		
+		newMain();
+		
+	}
+	
+	private static void newMain() {
+		
+		Mat frame = new Mat();
+		VideoCapture vc = new VideoCapture();
+		vc.open(0);
+		if (!vc.isOpened()) {
+			System.err.println("VideoCapture is not opened");
+			vc.close();
+			return;
+		}
+		
+		ImageWindow d = new ImageWindow("test");
+		while(!d.isSpacePressed()) {
+			vc.read(frame);
+			if (frame.empty()) {
+				System.out.println("empty frame grabbed wtf");
+				continue;
+			}
+			
+			List<List<Point>> squares = new ArrayList<List<Point>>();
+			Utils.findSquares(frame, squares);
+			List<Point> square = null;
+			try {
+				square = Utils.getBiggestSquare(squares);
+			} catch (IllegalArgumentException ex) {
+				d.showImage(frame);
+				continue;
+			}
+			
+			for(int i = 0; i < square.size(); i++) {
+				line(frame, square.get(i), square.get((i + 1) % square.size()), new Scalar(0, 0, 255, 255), 3, 8, 0);
+			}
+			d.showImage(frame);
+		}
+		
+		RobotTracker rt = new RobotTracker("data/cascade.xml");
+		GraphFinder gf = new GraphFinder();
+		Mat transformation = gf.findGraph(frame);
+		
+		while(true) {
+			vc.read(frame);
+			if (frame.empty()) {
+				System.out.println("empty frame grabbed wtf");
+				continue;
+			}
+
+			Mat gray = new Mat(), warped = new Mat();
+			warpPerspective(frame, warped, transformation, new Size(frame.cols(), frame.rows()));
+			
+			cvtColor(warped, gray, CV_BGR2GRAY);
+			Rect[] r = rt.findRobots(gray);
+			for(Rect rr : r) {
+				rectangle(gray, rr, new Scalar(0, 0, 255, 255));
+			}
+			d.showImage(gray);
+			
+		}
+	}
+
+	private static void oldMain() {
 		boolean captureTrainImages = false;
-		boolean generateBgFile = true;
+		boolean generateBgFile = false;
 		boolean convertImages = false;
 		boolean downloadImages = false;
-		boolean trackTest = false;
+		boolean trackTest = true;
 				
 		boolean loadFromStorage = false;
 		System.out.println("hello");
-		
 		
 		if (captureTrainImages) {
 			TestImageCapturer tic = new TestImageCapturer("bg");
@@ -62,7 +133,7 @@ public class TrackingMain {
 			System.out.println("VideoCapture opened successfully");
 			System.out.println("Starting to grab frames");
 			ImageWindow d = new ImageWindow("test");
-			for (int i = 0; i < 30; i++) {
+			for (int i = 0; i < 60; i++) {
 				vc.read(frame);
 				if (frame.empty()) {
 					System.out.println("empty frame grabbed wtf");
@@ -75,7 +146,7 @@ public class TrackingMain {
 		}
 		
 		if (trackTest) {
-			RobotTracker rt = new RobotTracker("data/04/cascade.xml");
+			RobotTracker rt = new RobotTracker("data/cascade.xml");
 			Mat gray = new Mat(), normalized = new Mat();
 			normalize(frame, normalized);
 			cvtColor(frame, gray, CV_BGR2GRAY);
