@@ -24,10 +24,24 @@ import org.bytedeco.javacpp.indexer.Indexer;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
-public class Utils {
+/**
+ * A helper class containing static helper functions.
+ * 
+ * @author Adam Lechovský
+ *
+ */
+public class StaticUtils {
 	
+	/**
+	 * A program-wide Random instance
+	 */
 	public static Random rand = new Random();
 	
+	/**
+	 * Calls OpenCV HoughLinesP() and all necessary transformations on the source image.
+	 * @param img The image to call HoughLinesP() on
+	 * @return The result of HoughLinesP() as ArrayList of lines, where one line is a Pair of Points
+	 */
 	public static List<Pair<Point, Point>> getLines(Mat img) {
 		Mat gray = new Mat(), dilated = new Mat(), edges = new Mat(), lines = new Mat();
 		cvtColor(img, gray, CV_BGR2GRAY);
@@ -49,6 +63,14 @@ public class Utils {
 		return r;
 	}
 	
+	/**
+	 * Takes the output of getLines() and groups the lines into vertical and horizontal lines 
+	 * which are at least threshold apart from each other.
+	 * @param input The List of lines to group
+	 * @param horizontal The result horizontal lines will be put into this List - should already be initialized
+	 * @param vertical The result vertical lines will be put into this List - should already be initialized
+	 * @param threshold A number denoting how far should the groups of lines be from each other in pixels
+	 */
 	public static void groupLines(List<Pair<Point, Point>> input, List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, double threshold) {
 		
 		List<Pair<Point, Point>> horizontal_temp = new ArrayList<Pair<Point, Point>>();
@@ -165,6 +187,13 @@ public class Utils {
 		}
 	}
 	
+	/**
+	 * Takes a List of Points and groups the Points so that the distance between any two groups is at least threshold.
+	 * Every group then gets transformed into a single Point by averaging the Points in the group.
+	 * @param points The List of Points to be grouped
+	 * @param threshold The distance between groups in pixels
+	 * @return The grouped List of Points
+	 */
 	public static List<Point> groupPoints(List<Point> points, double threshold) {
 		List<Point> r = new ArrayList<Point>();
 		
@@ -181,6 +210,11 @@ public class Utils {
 		return r;
 	}
 	
+	/**
+	 * Opens a single window with set image and caption.
+	 * @param image The image to show in the window
+	 * @param caption The caption of the window
+	 */
 	public static void display(Mat image, String caption) {
         // Create image window named "My Image".
 		
@@ -196,7 +230,13 @@ public class Utils {
         
     }
 	
-	public static Mat scaleImageToFit(Mat image, Mat output) {
+	/**
+	 * Takes an image, finds a paper in it and returns a transformation that would scale
+	 * the paper over the whole image.
+	 * @param image The image to calculate the transformation from
+	 * @return The transformation required to scale the paper in the image over the whole image
+	 */
+	public static Mat getPaperTransformation(Mat image) {
 		List<List<Point>> squares = new ArrayList<List<Point>>();
 		findSquares(new Mat(image), squares);
 		List<Point> biggestSquare;
@@ -220,13 +260,17 @@ public class Utils {
 	    to.add(new Point(image.cols(), image.rows()));
 	    to.add(new Point(0, image.rows()));
 	    Mat toMat = pointsToMat(to);
-	    
-	    Mat transformation = getPerspectiveTransform(srcMat, toMat);
-	    
-	    warpPerspective(image, output, transformation, new Size(image.cols(), image.rows()));
-	    return transformation;
+
+	    return getPerspectiveTransform(srcMat, toMat);
 	}
 	
+	/**
+	 * Takes two lines written as Pairs of Points and returns the Point of their intersection.
+	 * @param line1 The first line
+	 * @param line2 The second line
+	 * @return The Point of intersection of the two lines
+	 * @throws NoIntersectionException Thrown when the two lines do not intersect
+	 */
 	public static Point lineIntersection(Pair<Point, Point> line1, Pair<Point, Point> line2) throws NoIntersectionException {
 		int x1diff = line1.first.x() - line1.second.x();
 		int x2diff = line2.first.x() - line2.second.x();
@@ -246,19 +290,40 @@ public class Utils {
 		return new Point(x, y);
 	}
 	
+	/**
+	 * Calculates the distance between two Points.
+	 * @param p1 The first Point
+	 * @param p2 The second Point
+	 * @return The distance between the two Points
+	 */
 	public static double getDist(Point p1, Point p2) {
 		return Math.sqrt((p1.x() - p2.x()) * (p1.x() - p2.x()) + (p1.y() - p2.y()) * (p1.y() - p2.y()));
 	}
 	
+	/**
+	 * Calculates the determinant of a 2x2 matrix.
+	 * @param x1 Number at index 0,0
+	 * @param x2 Number at index 0,1
+	 * @param y1 Number at index 1,0
+	 * @param y2 Number at index 1,1
+	 * @return The determinant of the matrix
+	 */
 	private static int det(int x1, int x2, int y1, int y2) {
 		return x1 * y2 - x2 * y1;
 	}
 	
+	/**
+	 * Takes a List of squares where each square is a List of four Points (doesn't strictly have to be a square)
+	 * and returns the one with the largest area.
+	 * @param squares The list of squares
+	 * @return The largest square by area.
+	 * @throws IllegalArgumentException Thrown if the list of squares is empty.
+	 */
 	public static List<Point> getBiggestSquare(List<List<Point>> squares) throws IllegalArgumentException {
 		double maxArea = -1.0;
 		List<Point> maxAreaSquare = null;
 		for(List<Point> square : squares) {
-			double curSquareArea = getPolygonArea(square);
+			double curSquareArea = getApproximateSquareArea(square);
 			if (curSquareArea > maxArea) {
 				maxArea = curSquareArea;
 				maxAreaSquare = square;
@@ -269,6 +334,11 @@ public class Utils {
 		return maxAreaSquare;
 	}
 	
+	/**
+	 * Takes an image and returns a List of squares (4 sided polygons) as returned by OpenCV approxPolyDP().
+	 * @param image The image to find squares in
+	 * @param squares The output List with the squares. Must already be initialized
+	 */
 	public static void findSquares(Mat image, List<List<Point>> squares) {
 	    // blur will enhance edge detection
 	    Mat blurred = new Mat(image);
@@ -355,7 +425,13 @@ public class Utils {
 	    }        
 	}
 		
-	private static double getPolygonArea(List<Point> square) {
+	/**
+	 * Takes a square as a List of four Points and calculates its approximate area (enough to get the largest square
+	 * out of a List of squares).
+	 * @param square The square to calculate the area of
+	 * @return The approximate area of the square
+	 */
+	private static double getApproximateSquareArea(List<Point> square) {
 		double max = -1.0;
 		
 		for(int i = 0; i < square.size(); i++) {
@@ -370,6 +446,11 @@ public class Utils {
 		return max;
 	}
 	
+	/**
+	 * Takes a square as a List of four Points and sorts its vertices in a clockwise fashion.
+	 * @param square The square to be sorted
+	 * @return The sorted square
+	 */
 	private static List<Point> sortSquareClockWise(List<Point> square) {
 		List<Point> r = new ArrayList<Point>(4);
 		r.add(square.stream().min((a, b) -> { // upper left
@@ -396,6 +477,13 @@ public class Utils {
 		return r;
 	}
 	
+	/**
+	 * Calculates the angle between three Points, where pt0 is the center Point.
+	 * @param pt1 The first side Point
+	 * @param pt2 The second side Point
+	 * @param pt0 The center Point
+	 * @return The cosine of the angle between the three Points
+	 */
 	private static double angle( Point pt1, Point pt2, Point pt0 )
 	{
 	    double dx1 = pt1.x() - pt0.x();
@@ -405,6 +493,11 @@ public class Utils {
 	    return (dx1*dx2 + dy1*dy2)/Math.sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
 	}
 	
+	/**
+	 * Takes a List of Points and puts them into a Mat to be used in OpenCV functions.
+	 * @param points The List of Points to be put into a Mat
+	 * @return The Mat containing the Points
+	 */
 	private static Mat pointsToMat(List<Point> points) {
 		Mat r = new Mat(3, new int[] {1, points.size(), 2}, CV_32F);
 		Indexer indexer = r.createIndexer();

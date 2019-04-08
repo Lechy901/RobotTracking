@@ -12,7 +12,7 @@ import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_videoio.VideoCapture;
 
 import util.ImageWindow;
-import util.Utils;
+import util.StaticUtils;
 
 public class TestImageCapturer {
 	

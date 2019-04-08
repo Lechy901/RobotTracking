@@ -9,7 +9,7 @@ import org.bytedeco.javacpp.opencv_core.Scalar;
 
 import util.NoIntersectionException;
 import util.Pair;
-import util.Utils;
+import util.StaticUtils;
 
 public class ImageGraph {
 	public List<Point> vertices;
@@ -32,7 +32,7 @@ public class ImageGraph {
 		for(int i = 0; i < horizontal.size(); i++) {
 			for(int j = 0; j < vertical.size(); j++) {
 				try {
-					Point intersection = Utils.lineIntersection(horizontal.get(i), vertical.get(j));
+					Point intersection = StaticUtils.lineIntersection(horizontal.get(i), vertical.get(j));
 					vertices.add(intersection);
 				} catch (NoIntersectionException ex) {
 					
@@ -40,7 +40,26 @@ public class ImageGraph {
 			}
 		}
 		
-		vertices = Utils.groupPoints(vertices, 50);
+		vertices = StaticUtils.groupPoints(vertices, 50);
+	}
+	
+	public Pair<Point, Point> getRobotPositionInGraph(Point p) {
+		Point nearest = null, secondNearest = null;
+		double nearestDist = Double.MAX_VALUE, secondNearestDist = Double.MAX_VALUE;
 		
+		for(Point cur_vertex : vertices) {
+			double cur_dist = StaticUtils.getDist(p, cur_vertex);
+			if (cur_dist < nearestDist) {
+				secondNearest = nearest;
+				secondNearestDist = nearestDist;
+				nearest = cur_vertex;
+				nearestDist = cur_dist;
+			} else if (cur_dist < secondNearestDist) {
+				secondNearest = cur_vertex;
+				secondNearestDist = cur_dist;
+			}
+		}
+		
+		return new Pair<Point, Point>(nearest, secondNearest);
 	}
 }

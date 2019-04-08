@@ -1,5 +1,11 @@
 package util;
 
+/**
+ * A custom Exception
+ * 
+ * @author Adam Lechovský
+ *
+ */
 public class NoIntersectionException extends Exception {
 
 	private static final long serialVersionUID = -3899865746568487774L;

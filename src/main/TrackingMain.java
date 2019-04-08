@@ -5,7 +5,7 @@ import training_utils.ImageUtils;
 import training_utils.TestImageCapturer;
 import util.ImageWindow;
 import util.Pair;
-import util.Utils;
+import util.StaticUtils;
 
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_videoio.*;
@@ -51,10 +51,10 @@ public class TrackingMain {
 			}
 			
 			List<List<Point>> squares = new ArrayList<List<Point>>();
-			Utils.findSquares(frame, squares);
+			StaticUtils.findSquares(frame, squares);
 			List<Point> square = null;
 			try {
-				square = Utils.getBiggestSquare(squares);
+				square = StaticUtils.getBiggestSquare(squares);
 			} catch (IllegalArgumentException ex) {
 				d.showImage(frame);
 				continue;
@@ -66,13 +66,11 @@ public class TrackingMain {
 			d.showImage(frame);
 		}
 		
-		//RobotTracker rt = new RobotTracker("data/06/cascade.xml");
-		//GraphFinder gf = new GraphFinder();
-		//Mat transformation = gf.findGraph(frame);
-		Mat output = new Mat();
-		Mat transformation = Utils.scaleImageToFit(frame, output);
+		RobotTracker rt = new RobotTracker("data/06/cascade.xml");
+		Mat transformation = StaticUtils.getPaperTransformation(frame);
+		ImageGraph ig = null;
 		
-		int iter = 0;
+		long iter = 0;
 		while(iter++ < 10 || !d.isSpacePressed()) {
 			vc.read(frame);
 			if (frame.empty()) {
@@ -81,10 +79,10 @@ public class TrackingMain {
 			}
 			Mat warped = new Mat();
 			warpPerspective(frame, warped, transformation, new Size(frame.cols(), frame.rows()));
-			List<Pair<Point, Point>> lines = Utils.getLines(warped);
+			List<Pair<Point, Point>> lines = StaticUtils.getLines(warped);
 			List<Pair<Point, Point>> horizontal = new ArrayList<Pair<Point, Point>>();
 			List<Pair<Point, Point>> vertical = new ArrayList<Pair<Point, Point>>();
-			Utils.groupLines(lines, horizontal, vertical, 40);
+			StaticUtils.groupLines(lines, horizontal, vertical, 40);
 			for (Pair<Point, Point> line : horizontal) {
 				line(warped, line.first, line.second, new Scalar(0, 0, 255, 255), 3, 8, 0);
 			}
@@ -92,7 +90,7 @@ public class TrackingMain {
 				line(warped, line.first, line.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
 			}
 			
-			ImageGraph ig = new ImageGraph(horizontal, vertical);
+			ig = new ImageGraph(horizontal, vertical);
 			for (Point vertex : ig.vertices) {
 				circle(warped, vertex, 8, new Scalar(0, 255, 0, 255));
 			}
@@ -100,8 +98,13 @@ public class TrackingMain {
 			d.showImage(warped);
 		}		
 		
-		/*
-		while(true) {
+		if (ig == null) {
+			vc.close();
+			return;
+		}
+		
+		iter = 0;
+		while(iter++ < 10 || !d.isSpacePressed()) {
 			vc.read(frame);
 			if (frame.empty()) {
 				System.out.println("empty frame grabbed wtf");
@@ -114,12 +117,16 @@ public class TrackingMain {
 			cvtColor(warped, gray, CV_BGR2GRAY);
 			Rect[] r = rt.findRobots(gray);
 			for(Rect rr : r) {
-				rectangle(gray, rr, new Scalar(0, 0, 255, 255));
+				rectangle(warped, rr, new Scalar(0, 0, 255, 255));
+				Point center = new Point(rr.x() + rr.width() / 2, rr.y() + rr.height() / 2);
+				Pair<Point, Point> robotVertices = ig.getRobotPositionInGraph(center);
+				circle(warped, robotVertices.first, 8, new Scalar(0, 255, 255, 255));
+				circle(warped, robotVertices.second, 8, new Scalar(0, 255, 255, 255));
 			}
-			d.showImage(gray);
+			d.showImage(warped);
 			
 		}
-		*/
+		
 	}
 
 	private static void oldMain() {
@@ -183,7 +190,7 @@ public class TrackingMain {
 			Mat gray = new Mat(), normalized = new Mat();
 			normalize(frame, normalized);
 			cvtColor(frame, gray, CV_BGR2GRAY);
-			Utils.display(gray, "norm");
+			StaticUtils.display(gray, "norm");
 			Rect[] r = rt.findRobots(gray);
 			for(Rect rr : r) {
 				rectangle(frame, rr, new Scalar(255, 255, 255, 255));
@@ -192,10 +199,10 @@ public class TrackingMain {
 				System.out.println(rr.y() + " " + rr.height());
 				System.out.println("end");
 			}
-			Utils.display(frame, "withRObots");
+			StaticUtils.display(frame, "withRObots");
 			return;
 		} 
-		Utils.display(frame, "new webcam frame");
+		StaticUtils.display(frame, "new webcam frame");
 		
 		if (!loadFromStorage)
 			vc.close();
