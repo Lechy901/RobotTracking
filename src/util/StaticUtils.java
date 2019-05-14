@@ -50,6 +50,8 @@ public class StaticUtils {
 		Canny(dilated, edges, 50, 150, 3, false);
 		HoughLinesP(edges, lines, 1, Math.PI / 180, 40, 10, 0);
 		
+		display(lines, "asdfasdf");
+		
 		List<Pair<Point, Point>> r = new ArrayList<Pair<Point, Point>>();
 		if (lines.isNull() || lines.rows() == 0)
 			return r;

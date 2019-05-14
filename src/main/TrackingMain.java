@@ -56,14 +56,14 @@ public class TrackingMain {
 			try {
 				square = StaticUtils.getBiggestSquare(squares);
 			} catch (IllegalArgumentException ex) {
-				d.showImage(frame);
+				d.showImage(frame, true);
 				continue;
 			}
 			
 			for(int i = 0; i < square.size(); i++) {
 				line(frame, square.get(i), square.get((i + 1) % square.size()), new Scalar(0, 0, 255, 255), 3, 8, 0);
 			}
-			d.showImage(frame);
+			d.showImage(frame, true);
 		}
 		
 		RobotTracker rt = new RobotTracker("data/06/cascade.xml");
@@ -95,7 +95,7 @@ public class TrackingMain {
 				circle(warped, vertex, 8, new Scalar(0, 255, 0, 255));
 			}
 			
-			d.showImage(warped);
+			d.showImage(warped, true);
 		}		
 		
 		if (ig == null) {
@@ -123,7 +123,7 @@ public class TrackingMain {
 				circle(warped, robotVertices.first, 8, new Scalar(0, 255, 255, 255));
 				circle(warped, robotVertices.second, 8, new Scalar(0, 255, 255, 255));
 			}
-			d.showImage(warped);
+			d.showImage(warped, true);
 			
 		}
 		
@@ -180,7 +180,7 @@ public class TrackingMain {
 					continue;
 				}
 				System.out.println("frame grabbed successfully");
-				d.showImage(frame);
+				d.showImage(frame, true);
 				//break;
 			}
 		}

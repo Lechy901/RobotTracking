@@ -11,9 +11,24 @@ import util.NoIntersectionException;
 import util.Pair;
 import util.StaticUtils;
 
+/**
+ * A class for representing a graph on an image. A vertex is a Point in the image.
+ * @author ALechovsky
+ *
+ */
 public class ImageGraph {
+	
+	/**
+	 * The list of vertices - Points in the image.
+	 */
 	public List<Point> vertices;
 	
+	/**
+	 * A constructor which takes a list of horizontal lines and a list of vertical lines, calculates intersections of all vertical lines with all horizontal lines,
+	 * and fills the vertices property accordingly.
+	 * @param horizontal Horizontal lines in the graph
+	 * @param vertical Vertical lines in the graph
+	 */
 	public ImageGraph(List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical) {
 		
 		vertices = new ArrayList<Point>();
@@ -43,6 +58,11 @@ public class ImageGraph {
 		vertices = StaticUtils.groupPoints(vertices, 50);
 	}
 	
+	/**
+	 * A function to determine which line in the graph lies the closest to a given Point
+	 * @param p A Point to be used in the calculation
+	 * @return The line which lies the closest to the given Point
+	 */
 	public Pair<Point, Point> getRobotPositionInGraph(Point p) {
 		Point nearest = null, secondNearest = null;
 		double nearestDist = Double.MAX_VALUE, secondNearestDist = Double.MAX_VALUE;

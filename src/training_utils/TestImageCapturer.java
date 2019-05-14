@@ -42,7 +42,7 @@ public class TestImageCapturer {
 				return;
 			}
 
-			iw.showImage(frame);
+			iw.showImage(frame, true);
 			if (i % 45 == 0) {
 				System.out.println("writing image " + img_num);
 				Mat gray = new Mat();
