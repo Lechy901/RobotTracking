@@ -12,6 +12,7 @@ import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_videoio.VideoCapture;
 
 import util.ImageWindow;
+import util.MainProgramWindow;
 import util.StaticUtils;
 
 public class TestImageCapturer {
@@ -42,7 +43,7 @@ public class TestImageCapturer {
 				return;
 			}
 
-			iw.showImage(frame, true);
+			iw.showImage(frame);
 			if (i % 45 == 0) {
 				System.out.println("writing image " + img_num);
 				Mat gray = new Mat();

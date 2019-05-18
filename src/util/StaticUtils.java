@@ -50,8 +50,6 @@ public class StaticUtils {
 		Canny(dilated, edges, 50, 150, 3, false);
 		HoughLinesP(edges, lines, 1, Math.PI / 180, 40, 10, 0);
 		
-		display(lines, "asdfasdf");
-		
 		List<Pair<Point, Point>> r = new ArrayList<Pair<Point, Point>>();
 		if (lines.isNull() || lines.rows() == 0)
 			return r;
@@ -202,7 +200,7 @@ public class StaticUtils {
 		while(!points.isEmpty()) {
 			Point cur = points.get(0);
 			
-			List<Point> nearby = points.stream().filter(x -> (getDist(cur, x) < threshold)).collect(Collectors.toList());
+			List<Point> nearby = points.stream().filter(x -> (dist(cur, x) < threshold)).collect(Collectors.toList());
 			points.removeAll(nearby);
 			
 			r.add(new Point((int)nearby.stream().mapToInt(a -> a.x()).average().getAsDouble(),
@@ -298,7 +296,7 @@ public class StaticUtils {
 	 * @param p2 The second Point
 	 * @return The distance between the two Points
 	 */
-	public static double getDist(Point p1, Point p2) {
+	public static double dist(Point p1, Point p2) {
 		return Math.sqrt((p1.x() - p2.x()) * (p1.x() - p2.x()) + (p1.y() - p2.y()) * (p1.y() - p2.y()));
 	}
 	
@@ -428,6 +426,23 @@ public class StaticUtils {
 	}
 		
 	/**
+	 * Calculates the angle between three Points, where pt0 is the center Point.
+	 * @param pt1 The first side Point
+	 * @param pt2 The second side Point
+	 * @param pt0 The center Point
+	 * @return The cosine of the angle between the three Points
+	 */
+	public static double angle( Point pt1, Point pt2, Point pt0 )
+	{
+	    double dx1 = pt1.x() - pt0.x();
+	    double dy1 = pt1.y() - pt0.y();
+	    double dx2 = pt2.x() - pt0.x();
+	    double dy2 = pt2.y() - pt0.y();
+	    return (dx1*dx2 + dy1*dy2)/Math.sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
+	}
+	
+	
+	/**
 	 * Takes a square as a List of four Points and calculates its approximate area (enough to get the largest square
 	 * out of a List of squares).
 	 * @param square The square to calculate the area of
@@ -477,22 +492,6 @@ public class StaticUtils {
 		}).get());
 		
 		return r;
-	}
-	
-	/**
-	 * Calculates the angle between three Points, where pt0 is the center Point.
-	 * @param pt1 The first side Point
-	 * @param pt2 The second side Point
-	 * @param pt0 The center Point
-	 * @return The cosine of the angle between the three Points
-	 */
-	private static double angle( Point pt1, Point pt2, Point pt0 )
-	{
-	    double dx1 = pt1.x() - pt0.x();
-	    double dy1 = pt1.y() - pt0.y();
-	    double dx2 = pt2.x() - pt0.x();
-	    double dy2 = pt2.y() - pt0.y();
-	    return (dx1*dx2 + dy1*dy2)/Math.sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
 	}
 	
 	/**

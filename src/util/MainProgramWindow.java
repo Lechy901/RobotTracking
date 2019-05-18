@@ -3,15 +3,20 @@ package util;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.text.NumberFormat;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,6 +28,8 @@ import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
+import base.WindowControl;
+
 import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
 
 
@@ -33,7 +40,7 @@ import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
  * @author Adam Lechovský
  *
  */
-public class ImageWindow {
+public class MainProgramWindow {
 	
 	private JFrame window;
 	private JLabel picLabelLeft;
@@ -41,12 +48,16 @@ public class ImageWindow {
 	private ImageIcon iconLeft;
 	private ImageIcon iconRight;
 	private boolean spacePressed = false;
+	private WindowControl windowControl;
 	
 	/**
 	 * A constructor which opens a new window with the specified caption.
 	 * @param caption The title of the window
+	 * @param wc The window control to be controled by form buttons
 	 */
-	public ImageWindow(String caption) {
+	public MainProgramWindow(String caption, WindowControl wc) {
+		windowControl = wc;
+		
 		window = new JFrame(caption);
 		window.setSize(1500, 900);
 		
@@ -77,7 +88,7 @@ public class ImageWindow {
         topPanel.setLayout(new BorderLayout());
         
         JPanel midPanel = new JPanel();
-        midPanel.setLayout(new BorderLayout());
+        midPanel.setLayout(new BoxLayout(midPanel, BoxLayout.Y_AXIS));
         
         JPanel botPanel = new JPanel();
         botPanel.setLayout(new BorderLayout());
@@ -86,19 +97,30 @@ public class ImageWindow {
         iconLeft.setImage(createAwtImage(new Mat(480, 640, CV_8UC3, new Scalar(0))));
         picLabelLeft = new JLabel(iconLeft);
         topPanel.add(picLabelLeft, "West");
+        
         iconRight = new ImageIcon();
         iconRight.setImage(createAwtImage(new Mat(480, 640, CV_8UC3, new Scalar(0))));
         picLabelRight = new JLabel(iconRight);
         topPanel.add(picLabelRight, "East");
         
         window.getContentPane().add(topPanel, "North");
+
+        JLabel label1 = new JLabel("Line width:");
+        midPanel.add(label1);
         
         JTextField text1 = new JTextField();
-        midPanel.add(text1, "West");
+        text1.setMaximumSize(new Dimension(300,30));
+        midPanel.add(text1);
         
         window.getContentPane().add(midPanel, "Center");
         
         JButton but1 = new JButton("Button1");
+        but1.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				windowControl.nextStage();
+			}
+		});
         botPanel.add(but1, "South");
         
         window.getContentPane().add(botPanel, "South");
