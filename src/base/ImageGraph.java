@@ -2,8 +2,10 @@ package base;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatExpr;
 import org.bytedeco.javacpp.opencv_core.Point;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.indexer.Indexer;
@@ -35,7 +37,7 @@ public class ImageGraph {
 	 * @param horizontal Horizontal lines in the graph
 	 * @param vertical Vertical lines in the graph
 	 */
-	public ImageGraph(List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, Mat image) {
+	public ImageGraph(List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, Mat image, int groupPointsThreshold) {
 		
 		vertices = new ArrayList<Point>();
 		edges = new ArrayList<Pair<Point, Point>>();
@@ -62,7 +64,7 @@ public class ImageGraph {
 			vertices.add(vertical.get(i).second);
 		}
 		
-		vertices = StaticUtils.groupPoints(vertices, 50);
+		vertices = StaticUtils.groupPoints(vertices, groupPointsThreshold);
 		
 		// fill edges - for each vertex, add the two edges that go to the left and up - if there are any
 		for(int i = 0; i < vertices.size(); i++) {
@@ -99,28 +101,24 @@ public class ImageGraph {
 	}
 	
 	/**
-	 * A function to determine which line in the graph lies the closest to a given Point
+	 * A function to determine where is the closest in the graph to a selected Point
 	 * @param p A Point to be used in the calculation
-	 * @return The line which lies the closest to the given Point
+	 * @return The Point which lies on the graph the closest to the given Point
 	 */
-	public Pair<Point, Point> getRobotPositionInGraph(Point p) {
-		Point nearest = null, secondNearest = null;
-		double nearestDist = Double.MAX_VALUE, secondNearestDist = Double.MAX_VALUE;
+	public Point getRobotPositionInGraph(Point p) {
+		Point nearest = null;
+		double nearestDist = Double.MAX_VALUE;
 		
-		for(Point cur_vertex : vertices) {
-			double cur_dist = StaticUtils.dist(p, cur_vertex);
-			if (cur_dist < nearestDist) {
-				secondNearest = nearest;
-				secondNearestDist = nearestDist;
-				nearest = cur_vertex;
-				nearestDist = cur_dist;
-			} else if (cur_dist < secondNearestDist) {
-				secondNearest = cur_vertex;
-				secondNearestDist = cur_dist;
+		for(Pair<Point, Point> line : edges) {
+			Point currentNearest = nearestPoint(line, p);
+			double dist = StaticUtils.dist(currentNearest, p);
+			if (dist < nearestDist) {
+				nearest = currentNearest;
+				nearestDist = dist;
 			}
 		}
 		
-		return new Pair<Point, Point>(nearest, secondNearest);
+		return nearest;
 	}
 	
 	private Point getNearest(Point p, List<Point> l) {
@@ -136,6 +134,13 @@ public class ImageGraph {
 		return nearest;
 	}
 	
+	/**
+	 * Checks whether two points in an image are connected by black pixels	
+	 * @param p1 The first point
+	 * @param p2 The second point
+	 * @param image The image
+	 * @return true if connected
+	 */
 	private boolean areConnectedByEdge(Point p1, Point p2, Mat image) {
 		double deltaX = p2.x() - p1.x();
 		double deltaY = p2.y() - p1.y();
@@ -153,14 +158,42 @@ public class ImageGraph {
 		
 		Indexer indexer = image.createIndexer();
 		for(int i = 0; i < numberOfSteps; i++) {
-			int curR = (int)indexer.getDouble(p1.y() + (int)(stepY * i), p1.x() + (int)(stepX * i), 0);
-			int curG = (int)indexer.getDouble(p1.y() + (int)(stepY * i), p1.x() + (int)(stepX * i), 1);
-			int curB = (int)indexer.getDouble(p1.y() + (int)(stepY * i), p1.x() + (int)(stepX * i), 2);
+			int curX = p1.x() + (int)(stepX * i);
+			int curY = p1.y() + (int)(stepY * i);
+			if (curY >= image.rows() || curX >= image.cols() || curY < 0 || curX < 0)
+					return false;
+			int curR = (int)indexer.getDouble(curY, curX, 0);
+			int curG = (int)indexer.getDouble(curY, curX, 1);
+			int curB = (int)indexer.getDouble(curY, curX, 2);
 			
 			if (curR > 150 || curG > 150 || curB > 150)
 				return false;
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Takes a line and a point and returns the nearest point on the line to the given point
+	 * @param line The line to calculate nearest point on
+	 * @param p The point to calculate nearest point on the line to
+	 * @return The point on the line closest to the given point
+	 */
+	private Point nearestPoint(Pair<Point, Point> line, Point p) {
+		
+		Point ap = new Point(p.x() - line.first.x(), p.y() - line.first.y());
+		Point ab = new Point(line.second.x() - line.first.x(), line.second.y() - line.first.y());
+		
+		double abDist = StaticUtils.dist(line.first, line.second);
+		double abDist2 = abDist * abDist;
+		double abapProduct = ap.ddot(ab);
+		double distance = abapProduct / abDist2;
+		
+		if (distance < 0)
+			return line.first;
+		else if (distance > 1)
+			return line.second;
+		else
+			return new Point((int)(line.first.x() + ab.x() * distance), (int)(line.first.y() + ab.y() * distance));
 	}
 }

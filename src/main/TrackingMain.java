@@ -29,7 +29,7 @@ public class TrackingMain {
 			return;
 		}
 		
-		WindowControl wc = new WindowControl();
+		WindowControl wc = new WindowControl(pa.lineWidth, pa.robotsNumber, pa.pointGroupDistance);
 		wc.start();
 	}
 	
@@ -43,48 +43,52 @@ public class TrackingMain {
 		
 		for(int i = 0; i < args.length; i += 2) {
 			String next = args[i + 1];
-			switch(args[i].toLowerCase()) {
-			case "-capturetrainimages":
-				r.captureTrainImages = Boolean.parseBoolean(next);
-				break;
-			case "-capturetrainimagesfilenumber":
-				r.captureTrainImagesFileNumber = Integer.parseInt(next);
-				break;
-			case "-capturetrainimagesdirpath":
-				r.captureTrainImagesDirPath = next;
-				break;
-			case "-generatebgfile":
-				r.generateBgFile = Boolean.parseBoolean(next);
-				break;
-			case "-generatebgfiledirpath":
-				r.generateBgFileDirPath = next;
-				break;
-			case "-generatebgfilefilename":
-				r.generateBgFileFileName = next;
-				break;
-			case "-convertimages":
-				r.convertImages = Boolean.parseBoolean(next);
-				break;
-			case "-convertimagesdirpath":
-				r.convertImagesDirPath = next;
-				break;
-			case "-downloadimages":
-				r.downloadImages = Boolean.parseBoolean(next);
-				break;
-			case "-downloadimagesdirpath":
-				r.downloadImagesDirPath = next;
-				break;
-			case "-linewidth":
-				r.lineWidth = Integer.parseInt(next);
-				break;
-			case "-robotsnumber":
-				r.robotsNumber = Integer.parseInt(next);
-				break;
-			case "-pointgroupdistance":
-				r.pointGroupDistance = Integer.parseInt(next);
-				break;
-			default:
-				System.err.println("Unknown command line argument: " + args[i]);
+			try {
+				switch(args[i].toLowerCase()) {
+				case "-capturetrainimages":
+					r.captureTrainImages = Boolean.parseBoolean(next);
+					break;
+				case "-capturetrainimagesfilenumber":
+					r.captureTrainImagesFileNumber = Integer.parseInt(next);
+					break;
+				case "-capturetrainimagesdirpath":
+					r.captureTrainImagesDirPath = next;
+					break;
+				case "-generatebgfile":
+					r.generateBgFile = Boolean.parseBoolean(next);
+					break;
+				case "-generatebgfiledirpath":
+					r.generateBgFileDirPath = next;
+					break;
+				case "-generatebgfilefilename":
+					r.generateBgFileFileName = next;
+					break;
+				case "-convertimages":
+					r.convertImages = Boolean.parseBoolean(next);
+					break;
+				case "-convertimagesdirpath":
+					r.convertImagesDirPath = next;
+					break;
+				case "-downloadimages":
+					r.downloadImages = Boolean.parseBoolean(next);
+					break;
+				case "-downloadimagesdirpath":
+					r.downloadImagesDirPath = next;
+					break;
+				case "-linewidth":
+					r.lineWidth = Integer.parseInt(next);
+					break;
+				case "-robotsnumber":
+					r.robotsNumber = Integer.parseInt(next);
+					break;
+				case "-pointgroupdistance":
+					r.pointGroupDistance = Integer.parseInt(next);
+					break;
+				default:
+					System.err.println("Unknown command line argument: " + args[i]);
+				}
+			} catch (NumberFormatException ex) {
+				System.err.println("Error while parsing number: " + next);
 			}
 		}
 		

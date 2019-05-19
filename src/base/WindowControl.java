@@ -31,9 +31,13 @@ public class WindowControl {
 	private ImageGraph ig;
 	private Mat curFrameLeft, curFrameRight;
 	private MainProgramWindow mpw;
+	private int lineWidth, robotsNumber, pointGroupDistance;
 	
-	public WindowControl() {
-		mpw = new MainProgramWindow("test", this);
+	public WindowControl(int lineWidth, int robotsNumber, int pointGroupDistance) {
+		this.lineWidth = lineWidth;
+		this.robotsNumber = robotsNumber;
+		this.pointGroupDistance = pointGroupDistance;
+		mpw = new MainProgramWindow("test", this, lineWidth, robotsNumber, pointGroupDistance);
 		windowStage = WindowStage.NONE;
 		rt = new RobotTracker("data/06/cascade.xml");
 		resetRightFrame();
@@ -82,12 +86,12 @@ public class WindowControl {
 				}
 				Mat warped = new Mat();
 				warpPerspective(curFrameLeft, warped, transformation, new Size(curFrameLeft.cols(), curFrameLeft.rows()));
-				List<Pair<Point, Point>> lines = StaticUtils.getLines(warped);
+				List<Pair<Point, Point>> lines = StaticUtils.getLines(warped, lineWidth / 2);
 				List<Pair<Point, Point>> horizontal = new ArrayList<Pair<Point, Point>>();
 				List<Pair<Point, Point>> vertical = new ArrayList<Pair<Point, Point>>();
 				StaticUtils.groupLines(lines, horizontal, vertical, 40);
 				
-				ig = new ImageGraph(horizontal, vertical, warped);
+				ig = new ImageGraph(horizontal, vertical, warped, pointGroupDistance);
 				for (Point vertex : ig.vertices) {
 					circle(warped, vertex, 8, new Scalar(0, 255, 0, 255));
 				}
@@ -106,6 +110,11 @@ public class WindowControl {
 					continue;
 				}
 	
+				curFrameRight = new Mat(480, 640, CV_8UC3, new Scalar(0));
+				for (Pair<Point, Point> edge : ig.edges) {
+					line(curFrameRight, edge.first, edge.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
+				}
+				
 				Mat gray = new Mat(), warped = new Mat();
 				warpPerspective(curFrameLeft, warped, transformation, new Size(curFrameLeft.cols(), curFrameLeft.rows()));
 				
@@ -114,12 +123,11 @@ public class WindowControl {
 				for(Rect rr : r) {
 					rectangle(warped, rr, new Scalar(0, 0, 255, 255));
 					Point center = new Point(rr.x() + rr.width() / 2, rr.y() + rr.height() / 2);
-					Pair<Point, Point> robotVertices = ig.getRobotPositionInGraph(center);
-					circle(warped, robotVertices.first, 8, new Scalar(0, 255, 255, 255));
-					circle(warped, robotVertices.second, 8, new Scalar(0, 255, 255, 255));
+					Point robotPosition = ig.getRobotPositionInGraph(center);
+					circle(curFrameRight, robotPosition, 8, new Scalar(0, 255, 255, 255));
 				}
 				mpw.showImage(warped, true);
-				
+				mpw.showImage(curFrameRight, false);
 			}
 		}
 	}
@@ -134,12 +142,12 @@ public class WindowControl {
 			Mat warped = new Mat();
 			warpPerspective(curFrameLeft, warped, transformation, new Size(curFrameLeft.cols(), curFrameLeft.rows()));
 			
-			List<Pair<Point, Point>> lines = StaticUtils.getLines(warped);
+			List<Pair<Point, Point>> lines = StaticUtils.getLines(warped, lineWidth / 2);
 			List<Pair<Point, Point>> horizontal = new ArrayList<Pair<Point, Point>>();
 			List<Pair<Point, Point>> vertical = new ArrayList<Pair<Point, Point>>();
 			StaticUtils.groupLines(lines, horizontal, vertical, 40);
 
-			ig = new ImageGraph(horizontal, vertical, warped);
+			ig = new ImageGraph(horizontal, vertical, warped, pointGroupDistance);
 			for (Point vertex : ig.vertices) {
 				circle(curFrameRight, vertex, 8, new Scalar(0, 255, 0, 255));
 			}
@@ -163,6 +171,18 @@ public class WindowControl {
 	
 	public void prevStage() {
 		windowStage = windowStage.prev();
+	}
+	
+	public void setLineWidth(int lineWidth) {
+		this.lineWidth = lineWidth;
+	}
+
+	public void setRobotsNumber(int robotsNumber) {
+		this.robotsNumber = robotsNumber;
+	}
+
+	public void setPointGroupDistance(int pointGroupDistance) {
+		this.pointGroupDistance = pointGroupDistance;
 	}
 	
 	private void resetRightFrame() {

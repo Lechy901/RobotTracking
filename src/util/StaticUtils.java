@@ -42,11 +42,10 @@ public class StaticUtils {
 	 * @param img The image to call HoughLinesP() on
 	 * @return The result of HoughLinesP() as ArrayList of lines, where one line is a Pair of Points
 	 */
-	public static List<Pair<Point, Point>> getLines(Mat img) {
+	public static List<Pair<Point, Point>> getLines(Mat img, int dilateIterations) {
 		Mat gray = new Mat(), dilated = new Mat(), edges = new Mat(), lines = new Mat();
 		cvtColor(img, gray, CV_BGR2GRAY);
-		dilate(gray, dilated, new Mat(), new Point(-1,-1), 10, BORDER_CONSTANT, morphologyDefaultBorderValue());
-		//Utils.display(dilated, "edges");
+		dilate(gray, dilated, new Mat(), new Point(-1,-1), dilateIterations, BORDER_CONSTANT, morphologyDefaultBorderValue());
 		Canny(dilated, edges, 50, 150, 3, false);
 		HoughLinesP(edges, lines, 1, Math.PI / 180, 40, 10, 0);
 		
@@ -71,7 +70,7 @@ public class StaticUtils {
 	 * @param vertical The result vertical lines will be put into this List - should already be initialized
 	 * @param threshold A number denoting how far should the groups of lines be from each other in pixels
 	 */
-	public static void groupLines(List<Pair<Point, Point>> input, List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, double threshold) {
+	public static void groupLines(List<Pair<Point, Point>> input, List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, int threshold) {
 		
 		List<Pair<Point, Point>> horizontal_temp = new ArrayList<Pair<Point, Point>>();
 		List<Pair<Point, Point>> vertical_temp = new ArrayList<Pair<Point, Point>>();

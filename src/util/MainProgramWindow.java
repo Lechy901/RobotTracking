@@ -1,8 +1,7 @@
 package util;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,12 +10,10 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
-import java.text.NumberFormat;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,8 +22,6 @@ import javax.swing.WindowConstants;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
-import org.bytedeco.javacv.CanvasFrame;
-import org.bytedeco.javacv.OpenCVFrameConverter;
 
 import base.WindowControl;
 
@@ -43,11 +38,12 @@ import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
 public class MainProgramWindow {
 	
 	private JFrame window;
-	private JLabel picLabelLeft;
-	private JLabel picLabelRight;
+	private JLabel picLabelLeft, picLabelRight;
+	private JLabel label1, label2, label3, textWarning;
+	private JTextField text1, text2, text3;
 	private ImageIcon iconLeft;
 	private ImageIcon iconRight;
-	private boolean spacePressed = false;
+	private boolean validFormValues = true;
 	private WindowControl windowControl;
 	
 	/**
@@ -55,7 +51,7 @@ public class MainProgramWindow {
 	 * @param caption The title of the window
 	 * @param wc The window control to be controled by form buttons
 	 */
-	public MainProgramWindow(String caption, WindowControl wc) {
+	public MainProgramWindow(String caption, WindowControl wc, int defaultLineWidth, int defaultRobotsNumber, int defaultPointGroupDistance) {
 		windowControl = wc;
 		
 		window = new JFrame(caption);
@@ -68,19 +64,18 @@ public class MainProgramWindow {
         window.addKeyListener(new KeyListener() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				
+				if (!validFormValues)
+					return;
+				if (e.getKeyCode() == KeyEvent.VK_SPACE)
+					windowControl.nextStage();
 			}
 			
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_SPACE)
-					spacePressed = false;
 			}
 			
 			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_SPACE)
-					spacePressed = true;		
+			public void keyPressed(KeyEvent e) {		
 			}
 		});
         
@@ -105,12 +100,94 @@ public class MainProgramWindow {
         
         window.getContentPane().add(topPanel, "North");
 
-        JLabel label1 = new JLabel("Line width:");
+        label1 = new JLabel("Line width:");
         midPanel.add(label1);
         
-        JTextField text1 = new JTextField();
+        text1 = new JTextField();
         text1.setMaximumSize(new Dimension(300,30));
+        text1.setText(Integer.toString(defaultLineWidth));
+        text1.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				text1.setText(text1.getText().trim());
+				try {
+					windowControl.setLineWidth(Integer.parseInt(text1.getText()));
+					setFormValuesValidity(true);
+				} catch(Exception ex) {
+					setFormValuesValidity(false);
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		});
         midPanel.add(text1);
+        
+        label2 = new JLabel("Robots number:");
+        midPanel.add(label2);
+        
+        text2 = new JTextField();
+        text2.setMaximumSize(new Dimension(300,30));
+        text2.setText(Integer.toString(defaultRobotsNumber));
+        text2.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				text2.setText(text2.getText().trim());
+				try {
+					windowControl.setRobotsNumber(Integer.parseInt(text2.getText()));
+					setFormValuesValidity(true);
+				} catch(Exception ex) {
+					setFormValuesValidity(false);
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		});
+        midPanel.add(text2);
+        
+        label3 = new JLabel("Point group distance:");
+        midPanel.add(label3);
+        
+        text3 = new JTextField();
+        text3.setMaximumSize(new Dimension(300,30));
+        text3.setText(Integer.toString(defaultPointGroupDistance));
+        text3.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				text3.setText(text3.getText().trim());
+				try {
+					windowControl.setPointGroupDistance(Integer.parseInt(text3.getText()));
+					setFormValuesValidity(true);
+				} catch(Exception ex) {
+					setFormValuesValidity(false);
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		});
+        midPanel.add(text3);
+        
+        textWarning = new JLabel("All fields must be 32 bit integers!");
+        textWarning.setForeground(Color.RED);
+        textWarning.setVisible(false);
+        midPanel.add(textWarning);
         
         window.getContentPane().add(midPanel, "Center");
         
@@ -118,6 +195,8 @@ public class MainProgramWindow {
         but1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				if (!validFormValues)
+					return;
 				windowControl.nextStage();
 			}
 		});
@@ -143,14 +222,6 @@ public class MainProgramWindow {
 	}
 	
 	/**
-	 * Gets the status of the spacebar.
-	 * @return A boolean noting whether the spacebar is pressed or not
-	 */
-	public boolean isSpacePressed() {
-		return spacePressed;
-	}
-	
-	/**
 	 * Creates an image that is showable in a JFrame from OpenCV Mat
 	 * @param mat OpenCV Mat to convert
 	 * @return Awt BufferedImage for showing in JFrame
@@ -173,5 +244,10 @@ public class MainProgramWindow {
 	    mat.data().get(data);
 
 	    return image;
+	}
+	
+	private void setFormValuesValidity(boolean valid) {
+		validFormValues = valid;
+		textWarning.setVisible(!valid);
 	}
 }
