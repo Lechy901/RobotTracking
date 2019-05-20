@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -57,28 +58,10 @@ public class MainProgramWindow {
 		window = new JFrame(caption);
 		window.setSize(1500, 900);
 		
-        // Request closing of the application when the image window is closed.
+        // close the app when the window is closed
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
-        // Add a key listener for spacebar
-        window.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				if (!validFormValues)
-					return;
-				if (e.getKeyCode() == KeyEvent.VK_SPACE)
-					windowControl.nextStage();
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {		
-			}
-		});
-        
+        // set up three panels to hold content
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
         
@@ -88,6 +71,7 @@ public class MainProgramWindow {
         JPanel botPanel = new JPanel();
         botPanel.setLayout(new BorderLayout());
         
+        // fill the top panel with two picture labels
         iconLeft = new ImageIcon();
         iconLeft.setImage(createAwtImage(new Mat(480, 640, CV_8UC3, new Scalar(0))));
         picLabelLeft = new JLabel(iconLeft);
@@ -99,7 +83,8 @@ public class MainProgramWindow {
         topPanel.add(picLabelRight, "East");
         
         window.getContentPane().add(topPanel, "North");
-
+        
+        // fill the middle panel with calculation parameters textfields
         label1 = new JLabel("Line width:");
         midPanel.add(label1);
         
@@ -191,7 +176,8 @@ public class MainProgramWindow {
         
         window.getContentPane().add(midPanel, "Center");
         
-        JButton but1 = new JButton("Button1");
+        // add two buttons into the bottom panel
+        JButton but1 = new JButton("Next Stage");
         but1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -200,7 +186,19 @@ public class MainProgramWindow {
 				windowControl.nextStage();
 			}
 		});
-        botPanel.add(but1, "South");
+        botPanel.add(but1, "East");
+        
+        JButton but2 = new JButton("Previous Stage");
+        but2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!validFormValues)
+					return;
+				windowControl.prevStage();
+			}
+		});
+        botPanel.add(but2, "West");
+        botPanel.add(Box.createHorizontalGlue(), "Center");
         
         window.getContentPane().add(botPanel, "South");
         

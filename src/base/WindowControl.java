@@ -22,6 +22,12 @@ import util.MainProgramWindow;
 import util.Pair;
 import util.StaticUtils;
 
+/**
+ * A class which controls the content shown in the main window
+ * 
+ * @author ALechovsky
+ *
+ */
 public class WindowControl {
 	
 	private VideoCapture vc;
@@ -33,6 +39,12 @@ public class WindowControl {
 	private MainProgramWindow mpw;
 	private int lineWidth, robotsNumber, pointGroupDistance;
 	
+	/**
+	 * A constructor, already opens the window
+	 * @param lineWidth
+	 * @param robotsNumber
+	 * @param pointGroupDistance
+	 */
 	public WindowControl(int lineWidth, int robotsNumber, int pointGroupDistance) {
 		this.lineWidth = lineWidth;
 		this.robotsNumber = robotsNumber;
@@ -43,6 +55,9 @@ public class WindowControl {
 		resetRightFrame();
 	}
 	
+	/**
+	 * Start the VideoCapture and paper recognition
+	 */
 	public void start() {
 		curFrameLeft = new Mat();
 		vc = new VideoCapture();
@@ -61,17 +76,19 @@ public class WindowControl {
 					System.out.println("empty frame grabbed wtf");
 					continue;
 				}
-				
+				// find all squares in the image
 				List<List<Point>> squares = new ArrayList<List<Point>>();
 				StaticUtils.findSquares(curFrameLeft, squares);
 				List<Point> square = null;
 				try {
+					// find the biggest square
 					square = StaticUtils.getBiggestSquare(squares);
 				} catch (IllegalArgumentException ex) {
 					mpw.showImage(curFrameLeft, true);
 					continue;
 				}
 				
+				// draw the square
 				for(int i = 0; i < square.size(); i++) {
 					line(curFrameLeft, square.get(i), square.get((i + 1) % square.size()), new Scalar(0, 0, 255, 255), 3, 8, 0);
 				}
@@ -81,17 +98,31 @@ public class WindowControl {
 			if(windowStage == WindowStage.GRAPH_SEARCH) {
 				vc.read(curFrameLeft);
 				if (curFrameLeft.empty()) {
-					System.out.println("empty frame grabbed");
+					System.err.println("empty frame grabbed");
 					continue;
 				}
+				if (transformation == null)
+					continue;
+				
+				// warp perspective and recognize the graph lines in the image
 				Mat warped = new Mat();
 				warpPerspective(curFrameLeft, warped, transformation, new Size(curFrameLeft.cols(), curFrameLeft.rows()));
 				List<Pair<Point, Point>> lines = StaticUtils.getLines(warped, lineWidth / 2);
 				List<Pair<Point, Point>> horizontal = new ArrayList<Pair<Point, Point>>();
 				List<Pair<Point, Point>> vertical = new ArrayList<Pair<Point, Point>>();
 				StaticUtils.groupLines(lines, horizontal, vertical, 40);
+				/*
+				for (Pair<Point, Point> line : horizontal) {
+					line(warped, line.first, line.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
+				}
 				
+				for (Pair<Point, Point> line : vertical) {
+					line(warped, line.first, line.second, new Scalar(0, 255, 0, 255), 3, 8, 0);
+				}
+				*/
 				ig = new ImageGraph(horizontal, vertical, warped, pointGroupDistance);
+				
+				// draw the graph
 				for (Point vertex : ig.vertices) {
 					circle(warped, vertex, 8, new Scalar(0, 255, 0, 255));
 				}
@@ -109,7 +140,8 @@ public class WindowControl {
 					System.out.println("empty frame grabbed wtf");
 					continue;
 				}
-	
+				
+				// reset the right image and draw the graph again
 				curFrameRight = new Mat(480, 640, CV_8UC3, new Scalar(0));
 				for (Pair<Point, Point> edge : ig.edges) {
 					line(curFrameRight, edge.first, edge.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
@@ -118,6 +150,7 @@ public class WindowControl {
 				Mat gray = new Mat(), warped = new Mat();
 				warpPerspective(curFrameLeft, warped, transformation, new Size(curFrameLeft.cols(), curFrameLeft.rows()));
 				
+				// find robots and draw them into the right image
 				cvtColor(warped, gray, CV_BGR2GRAY);
 				Rect[] r = rt.findRobots(gray);
 				for(Rect rr : r) {
@@ -132,6 +165,9 @@ public class WindowControl {
 		}
 	}
 	
+	/**
+	 * Advance to the next stage
+	 */
 	public void nextStage() {
 		if (windowStage == WindowStage.GRAPH_SEARCH) {
 			if (ig == null) {
@@ -169,8 +205,18 @@ public class WindowControl {
 		windowStage = windowStage.next();
 	}
 	
+	/**
+	 * Go to previous stage
+	 */
 	public void prevStage() {
+		if (windowStage == WindowStage.PAPER_SEARCH) {
+			ig = null;
+		}
+		if (windowStage == WindowStage.GRAPH_SEARCH) {
+			transformation = null;
+		}
 		windowStage = windowStage.prev();
+		resetRightFrame();
 	}
 	
 	public void setLineWidth(int lineWidth) {

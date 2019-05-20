@@ -75,6 +75,8 @@ public class ImageGraph {
 			List<Point> left = new ArrayList<Point>();
 			List<Point> up = new ArrayList<Point>();
 			for(int j = 0; j < i; j++) {
+				if (j == i)
+					continue;
 				Point current_cmp = vertices.get(j);
 				double angle = StaticUtils.angle(current_cmp, new Point(current.x() + 1, current.y()), current);
 				if (angle < -0.97) {
@@ -157,6 +159,9 @@ public class ImageGraph {
 		double stepY = deltaY / numberOfSteps;
 		
 		Indexer indexer = image.createIndexer();
+		
+		int numberOfWhitePixels = 0;
+		
 		for(int i = 0; i < numberOfSteps; i++) {
 			int curX = p1.x() + (int)(stepX * i);
 			int curY = p1.y() + (int)(stepY * i);
@@ -166,9 +171,12 @@ public class ImageGraph {
 			int curG = (int)indexer.getDouble(curY, curX, 1);
 			int curB = (int)indexer.getDouble(curY, curX, 2);
 			
-			if (curR > 150 || curG > 150 || curB > 150)
-				return false;
+			if (curR > 130 || curG > 130 || curB > 130)
+				numberOfWhitePixels++;
 		}
+		
+		if (((double)numberOfWhitePixels / (double)numberOfSteps) > 0.6)
+			return false;
 		
 		return true;
 	}

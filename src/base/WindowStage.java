@@ -1,5 +1,11 @@
 package base;
 
+/**
+ * Describes the current program stage
+ * 
+ * @author ALechovsky
+ *
+ */
 public enum WindowStage {
 	NONE, PAPER_SEARCH {
 		@Override

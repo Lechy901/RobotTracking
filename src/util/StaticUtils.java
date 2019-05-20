@@ -45,7 +45,11 @@ public class StaticUtils {
 	public static List<Pair<Point, Point>> getLines(Mat img, int dilateIterations) {
 		Mat gray = new Mat(), dilated = new Mat(), edges = new Mat(), lines = new Mat();
 		cvtColor(img, gray, CV_BGR2GRAY);
-		dilate(gray, dilated, new Mat(), new Point(-1,-1), dilateIterations, BORDER_CONSTANT, morphologyDefaultBorderValue());
+
+		if (dilateIterations >= 0)
+			dilate(gray, dilated, new Mat(), new Point(-1,-1), dilateIterations, BORDER_CONSTANT, morphologyDefaultBorderValue());
+		else
+			erode(gray, dilated, new Mat(), new Point(-1, -1), -1 * dilateIterations, BORDER_CONSTANT, morphologyDefaultBorderValue());
 		Canny(dilated, edges, 50, 150, 3, false);
 		HoughLinesP(edges, lines, 1, Math.PI / 180, 40, 10, 0);
 		

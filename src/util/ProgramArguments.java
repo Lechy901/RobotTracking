@@ -1,5 +1,12 @@
 package util;
 
+/**
+ * A data class containing info about the program command lines arguments after parsing
+ * 
+ * @author ALechovsky
+ *
+ */
+
 public class ProgramArguments {
 	public boolean captureTrainImages = false;
 	public int captureTrainImagesFileNumber = 0;
@@ -15,7 +22,7 @@ public class ProgramArguments {
 	public boolean downloadImages = false;
 	public String downloadImagesDirPath = "paper-images";
 	
-	public int lineWidth = 20;
+	public int lineWidth = 0;
 	public int robotsNumber = 3;
-	public int pointGroupDistance = 50;
+	public int pointGroupDistance = 20;
 }
