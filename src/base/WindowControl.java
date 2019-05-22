@@ -101,8 +101,9 @@ public class WindowControl {
 					System.err.println("empty frame grabbed");
 					continue;
 				}
-				if (transformation == null)
+				if (transformation == null) {
 					continue;
+				}
 				
 				// warp perspective and recognize the graph lines in the image
 				Mat warped = new Mat();
@@ -197,8 +198,9 @@ public class WindowControl {
 		
 		if (windowStage == WindowStage.PAPER_SEARCH) {
 			transformation = StaticUtils.getPaperTransformation(curFrameLeft);
-			if (transformation == null)
+			if (transformation == null) {
 				return;
+			}
 			ig = null;
 		}
 		

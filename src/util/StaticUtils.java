@@ -46,16 +46,18 @@ public class StaticUtils {
 		Mat gray = new Mat(), dilated = new Mat(), edges = new Mat(), lines = new Mat();
 		cvtColor(img, gray, CV_BGR2GRAY);
 
-		if (dilateIterations >= 0)
+		if (dilateIterations >= 0) {
 			dilate(gray, dilated, new Mat(), new Point(-1,-1), dilateIterations, BORDER_CONSTANT, morphologyDefaultBorderValue());
-		else
+		} else {
 			erode(gray, dilated, new Mat(), new Point(-1, -1), -1 * dilateIterations, BORDER_CONSTANT, morphologyDefaultBorderValue());
+		} 
 		Canny(dilated, edges, 50, 150, 3, false);
 		HoughLinesP(edges, lines, 1, Math.PI / 180, 40, 10, 0);
 		
 		List<Pair<Point, Point>> r = new ArrayList<Pair<Point, Point>>();
-		if (lines.isNull() || lines.rows() == 0)
+		if (lines.isNull() || lines.rows() == 0) {
 			return r;
+		}
 		
 		Indexer indexer = lines.createIndexer();		
 		
@@ -81,10 +83,11 @@ public class StaticUtils {
 		
 		for(Pair<Point, Point> line : input) {
 			double lineAngle = angle(line.first, line.second, new Point(line.first.x() - 1, line.first.y()));
-			if (lineAngle < 0.1)
+			if (lineAngle < 0.1) {
 				vertical_temp.add(line);
-			else if (lineAngle > 0.9)
+			} else if (lineAngle > 0.9) {
 				horizontal_temp.add(line);
+			}
 		}
 		
 		vertical_temp.sort((a, b) -> {
@@ -281,8 +284,9 @@ public class StaticUtils {
 		int y2diff = line2.first.y() - line2.second.y();
 		
 		int div = det(x1diff, x2diff, y1diff, y2diff);
-		if (div == 0)
+		if (div == 0) {
 			throw new NoIntersectionException("lines do not intersect");
+		}
 		
 		int d1 = det(line1.first.x(), line1.first.y(), line1.second.x(), line1.second.y());
 		int d2 = det(line2.first.x(), line2.first.y(), line2.second.x(), line2.second.y());
@@ -332,8 +336,9 @@ public class StaticUtils {
 				maxAreaSquare = square;
 			}
 		}
-		if (maxAreaSquare == null)
+		if (maxAreaSquare == null) {
 			throw new IllegalArgumentException();
+		}
 		return maxAreaSquare;
 	}
 	
@@ -369,8 +374,9 @@ public class StaticUtils {
 	                // Dilate helps to remove potential holes between edge segments
 	                dilate(gray, gray, new Mat(), new Point(-1,-1), 1, BORDER_CONSTANT, morphologyDefaultBorderValue());
 	                //Utils.display(gray, "square finder gray c = " + c);
-	                if (c != 1)
+	                if (c != 1) {
 	                	break;
+	                }
 	            }
 	            else
 	            {
@@ -474,23 +480,27 @@ public class StaticUtils {
 	private static List<Point> sortSquareClockWise(List<Point> square) {
 		List<Point> r = new ArrayList<Point>(4);
 		r.add(square.stream().min((a, b) -> { // upper left
-			if (a.x() + a.y() < b.x() + b.y())
+			if (a.x() + a.y() < b.x() + b.y()) {
 				return -1;
+			}
 			return 1;
 		}).get());
 		r.add(square.stream().max((a, b) -> { // upper right
-			if (a.x() - a.y() < b.x() - b.y())
+			if (a.x() - a.y() < b.x() - b.y()) {
 				return -1;
+			}
 			return 1;
 		}).get());
 		r.add(square.stream().max((a, b) -> { // lower right
-			if (a.x() + a.y() < b.x() + b.y())
+			if (a.x() + a.y() < b.x() + b.y()) {
 				return -1;
+			}
 			return 1;
 		}).get());
 		r.add(square.stream().min((a, b) -> { // lower left
-			if (a.x() - a.y() < b.x() - b.y())
+			if (a.x() - a.y() < b.x() - b.y()) {
 				return -1;
+			}	
 			return 1;
 		}).get());
 		

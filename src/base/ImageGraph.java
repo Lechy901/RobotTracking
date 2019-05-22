@@ -75,8 +75,6 @@ public class ImageGraph {
 			List<Point> left = new ArrayList<Point>();
 			List<Point> up = new ArrayList<Point>();
 			for(int j = 0; j < i; j++) {
-				if (j == i)
-					continue;
 				Point current_cmp = vertices.get(j);
 				double angle = StaticUtils.angle(current_cmp, new Point(current.x() + 1, current.y()), current);
 				if (angle < -0.97) {
@@ -165,18 +163,21 @@ public class ImageGraph {
 		for(int i = 0; i < numberOfSteps; i++) {
 			int curX = p1.x() + (int)(stepX * i);
 			int curY = p1.y() + (int)(stepY * i);
-			if (curY >= image.rows() || curX >= image.cols() || curY < 0 || curX < 0)
+			if (curY >= image.rows() || curX >= image.cols() || curY < 0 || curX < 0) {
 					return false;
+			}
 			int curR = (int)indexer.getDouble(curY, curX, 0);
 			int curG = (int)indexer.getDouble(curY, curX, 1);
 			int curB = (int)indexer.getDouble(curY, curX, 2);
 			
-			if (curR > 130 || curG > 130 || curB > 130)
+			if (curR > 130 || curG > 130 || curB > 130) {
 				numberOfWhitePixels++;
+			}	
 		}
 		
-		if (((double)numberOfWhitePixels / (double)numberOfSteps) > 0.6)
+		if (((double)numberOfWhitePixels / (double)numberOfSteps) > 0.6) {
 			return false;
+		}
 		
 		return true;
 	}
@@ -197,11 +198,12 @@ public class ImageGraph {
 		double abapProduct = ap.ddot(ab);
 		double distance = abapProduct / abDist2;
 		
-		if (distance < 0)
+		if (distance < 0) {
 			return line.first;
-		else if (distance > 1)
+		} else if (distance > 1) {
 			return line.second;
-		else
+		} else {
 			return new Point((int)(line.first.x() + ab.x() * distance), (int)(line.first.y() + ab.y() * distance));
+		}
 	}
 }

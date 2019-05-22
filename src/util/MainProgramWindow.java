@@ -181,8 +181,9 @@ public class MainProgramWindow {
         but1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!validFormValues)
+				if (!validFormValues) {
 					return;
+				}
 				windowControl.nextStage();
 			}
 		});
@@ -192,8 +193,9 @@ public class MainProgramWindow {
         but2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!validFormValues)
+				if (!validFormValues) {
 					return;
+				}
 				windowControl.prevStage();
 			}
 		});
@@ -212,10 +214,11 @@ public class MainProgramWindow {
 	 */
 	public void showImage(Mat image, boolean left) {
 		// Show image on window.
-		if (left)
+		if (left) {
 			iconLeft.setImage(createAwtImage(image));
-		else
+		} else {
 			iconRight.setImage(createAwtImage(image));
+		}
 		window.repaint();
 	}
 	
