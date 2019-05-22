@@ -16,7 +16,7 @@ public class RobotTracker {
 	
 	/**
 	 * Create a new CascadeClassifier
-	 * @param cascadeFilename
+	 * @param cascadeFilename a filename of the cascade
 	 */
 	public RobotTracker(String cascadeFilename) {
 		cc = new CascadeClassifier(cascadeFilename);

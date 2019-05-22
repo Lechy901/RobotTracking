@@ -1,19 +1,15 @@
 package training_utils;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
-import static org.bytedeco.javacpp.opencv_imgproc.resize;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2GRAY;
 
 import java.io.File;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_videoio.VideoCapture;
 
 import util.ImageWindow;
-import util.MainProgramWindow;
-import util.StaticUtils;
 
 public class TestImageCapturer {
 	

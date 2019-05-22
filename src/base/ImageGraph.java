@@ -36,6 +36,8 @@ public class ImageGraph {
 	 * and fills the vertices property accordingly.
 	 * @param horizontal Horizontal lines in the graph
 	 * @param vertical Vertical lines in the graph
+	 * @param image The image over which the graph is created
+	 * @param groupPointsThreshold The distance two points need to be apart in order to be grouped into one point
 	 */
 	public ImageGraph(List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, Mat image, int groupPointsThreshold) {
 		
