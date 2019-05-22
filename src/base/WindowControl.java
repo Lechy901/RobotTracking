@@ -51,7 +51,7 @@ public class WindowControl {
 		this.pointGroupDistance = pointGroupDistance;
 		mpw = new MainProgramWindow("test", this, lineWidth, robotsNumber, pointGroupDistance);
 		windowStage = WindowStage.NONE;
-		rt = new RobotTracker("data/06/cascade.xml");
+		rt = new RobotTracker("resources/06/cascade.xml");
 		resetRightFrame();
 	}
 	
