@@ -12,24 +12,24 @@ import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
  *
  */
 public class RobotTracker {
-	private CascadeClassifier cc;
-	
-	/**
-	 * Create a new CascadeClassifier
-	 * @param cascadeFilename a filename of the cascade
-	 */
-	public RobotTracker(String cascadeFilename) {
-		cc = new CascadeClassifier(cascadeFilename);
-	}
-	
-	/**
-	 * A helper function to be used when searching for robots in an image.
-	 * @param frame The image to search.
-	 * @return An array of Rects representing the location of the robots in the image.
-	 */
-	public Rect[] findRobots(Mat frame) {
-		RectVector r = new RectVector();
-		cc.detectMultiScale(frame, r);
-		return r.get();
-	}
+    private CascadeClassifier cc;
+
+    /**
+     * Create a new CascadeClassifier
+     * @param cascadeFilename a filename of the cascade
+     */
+    public RobotTracker(String cascadeFilename) {
+        cc = new CascadeClassifier(cascadeFilename);
+    }
+
+    /**
+     * A helper function to be used when searching for robots in an image.
+     * @param frame The image to search.
+     * @return An array of Rects representing the location of the robots in the image.
+     */
+    public Rect[] findRobots(Mat frame) {
+        RectVector r = new RectVector();
+        cc.detectMultiScale(frame, r);
+        return r.get();
+    }
 }

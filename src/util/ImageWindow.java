@@ -17,31 +17,31 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
  *
  */
 public class ImageWindow {
-	
-	private OpenCVFrameConverter<Mat> converter;
-	private CanvasFrame canvas;
-	
-	/**
-	 * A constructor which opens a new window with the specified caption.
-	 * @param caption The title of the window
-	 */
-	public ImageWindow(String caption) {
-		canvas = new CanvasFrame(caption, 1.0);
-		
+
+    private OpenCVFrameConverter<Mat> converter;
+    private CanvasFrame canvas;
+
+    /**
+     * A constructor which opens a new window with the specified caption.
+     * @param caption The title of the window
+     */
+    public ImageWindow(String caption) {
+        canvas = new CanvasFrame(caption, 1.0);
+
         // Request closing of the application when the image window is closed.
         canvas.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         // Convert from OpenCV Mat to Java Buffered image for display
         converter = new OpenCVFrameConverter.ToMat();
-        
-	}
-	
-	/**
-	 * Changes the image shown in the window.
-	 * @param image The new image to be shown
-	 */
-	public void showImage(Mat image) {
-		// Show image on window.
-		canvas.showImage(converter.convert(image));
-	}
+
+    }
+
+    /**
+     * Changes the image shown in the window.
+     * @param image The new image to be shown
+     */
+    public void showImage(Mat image) {
+        // Show image on window.
+        canvas.showImage(converter.convert(image));
+    }
 }
