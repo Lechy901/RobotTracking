@@ -3,7 +3,7 @@ package base;
 /**
  * Describes the current program stage
  * 
- * @author ALechovsky
+ * @author Adam Lechovsky
  *
  */
 public enum WindowStage {

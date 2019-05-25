@@ -33,7 +33,7 @@ import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
  * A class designed to show a series of images (such as the output of a webcam) in a window.
  * Has added functionality for detecting spacebar status (pressed, not pressed).
  * 
- * @author Adam Lechovský
+ * @author Adam Lechovsky
  *
  */
 public class MainProgramWindow {

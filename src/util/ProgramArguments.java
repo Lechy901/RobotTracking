@@ -3,7 +3,7 @@ package util;
 /**
  * A data class containing info about the program command lines arguments after parsing
  * 
- * @author ALechovsky
+ * @author Adam Lechovsky
  *
  */
 

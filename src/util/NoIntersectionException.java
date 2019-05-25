@@ -3,7 +3,7 @@ package util;
 /**
  * A custom Exception
  * 
- * @author Adam Lechovský
+ * @author Adam Lechovsky
  *
  */
 public class NoIntersectionException extends Exception {

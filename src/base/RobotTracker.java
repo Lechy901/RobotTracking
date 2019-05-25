@@ -8,7 +8,7 @@ import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 /**
  * A helper class used to hold the CascadeClassifier
  * 
- * @author ALechovsky
+ * @author Adam Lechovsky
  *
  */
 public class RobotTracker {

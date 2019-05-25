@@ -27,7 +27,7 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 /**
  * A helper class containing static helper functions.
  * 
- * @author Adam Lechovský
+ * @author Adam Lechovsky
  *
  */
 public class StaticUtils {

@@ -25,7 +25,7 @@ import util.StaticUtils;
 /**
  * A class which controls the content shown in the main window
  * 
- * @author ALechovsky
+ * @author Adam Lechovsky
  *
  */
 public class WindowControl {

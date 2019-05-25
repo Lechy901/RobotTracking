@@ -24,7 +24,7 @@ import org.bytedeco.javacpp.opencv_core.*;
  * A class used to help with generating images for training the CascadeClassifier.
  * Not used during the runtime of the main program.
  * 
- * @author ALechovsky
+ * @author Adam Lechovsky
  *
  */
 public class ImageUtils {

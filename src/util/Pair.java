@@ -3,7 +3,7 @@ package util;
 /**
  * A helper class designed to hold a pair of data values.
  * 
- * @author Adam Lechovský
+ * @author Adam Lechovsky
  *
  * @param <T> The type of the first value
  * @param <U> The type of the second value
