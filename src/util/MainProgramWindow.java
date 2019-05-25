@@ -51,6 +51,9 @@ public class MainProgramWindow {
      * A constructor which opens a new window with the specified caption.
      * @param caption The title of the window
      * @param wc The window control to be controled by form buttons
+     * @param defaultLineWidth default line width
+     * @param defaultRobotsNumber default robots number
+     * @param defaultPointGroupDistance default point group distance
      */
     public MainProgramWindow(String caption, WindowControl wc, int defaultLineWidth, int defaultRobotsNumber, int defaultPointGroupDistance) {
         windowControl = wc;
@@ -210,7 +213,7 @@ public class MainProgramWindow {
     /**
      * Changes the image shown in the window.
      * @param image The new image to be shown
-     * @param left true => show image in the left JLabel, false => show image in the right JLabel
+     * @param left true = show image in the left JLabel, false = show image in the right JLabel
      */
     public void showImage(Mat image, boolean left) {
         // Show image on window.

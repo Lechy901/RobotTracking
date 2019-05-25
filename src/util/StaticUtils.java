@@ -40,6 +40,7 @@ public class StaticUtils {
     /**
      * Calls OpenCV HoughLinesP() and all necessary transformations on the source image.
      * @param img The image to call HoughLinesP() on
+     * @param dilateIterations how many iterations to run the dilate OpenCV function
      * @return The result of HoughLinesP() as ArrayList of lines, where one line is a Pair of Points
      */
     public static List<Pair<Point, Point>> getLines(Mat img, int dilateIterations) {

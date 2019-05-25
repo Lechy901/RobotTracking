@@ -41,9 +41,9 @@ public class WindowControl {
 
     /**
      * A constructor, already opens the window
-     * @param lineWidth
-     * @param robotsNumber
-     * @param pointGroupDistance
+     * @param lineWidth line width
+     * @param robotsNumber robots number
+     * @param pointGroupDistance point group distance
      */
     public WindowControl(int lineWidth, int robotsNumber, int pointGroupDistance) {
         this.lineWidth = lineWidth;
