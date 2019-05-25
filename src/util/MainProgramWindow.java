@@ -2,6 +2,7 @@ package util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,11 +11,13 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.WritableRaster;
+import java.util.function.Consumer;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -88,89 +91,10 @@ public class MainProgramWindow {
         window.getContentPane().add(topPanel, "North");
 
         // fill the middle panel with calculation parameters textfields
-        label1 = new JLabel("Line width:");
-        midPanel.add(label1);
-
-        text1 = new JTextField();
-        text1.setMaximumSize(new Dimension(300,30));
-        text1.setText(Integer.toString(defaultLineWidth));
-        text1.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                text1.setText(text1.getText().trim());
-                try {
-                    windowControl.setLineWidth(Integer.parseInt(text1.getText()));
-                    setFormValuesValidity(true);
-                } catch(Exception ex) {
-                    setFormValuesValidity(false);
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-            }
-        });
-        midPanel.add(text1);
-
-        label2 = new JLabel("Robots number:");
-        midPanel.add(label2);
-
-        text2 = new JTextField();
-        text2.setMaximumSize(new Dimension(300,30));
-        text2.setText(Integer.toString(defaultRobotsNumber));
-        text2.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                text2.setText(text2.getText().trim());
-                try {
-                    windowControl.setRobotsNumber(Integer.parseInt(text2.getText()));
-                    setFormValuesValidity(true);
-                } catch(Exception ex) {
-                    setFormValuesValidity(false);
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-            }
-        });
-        midPanel.add(text2);
-
-        label3 = new JLabel("Point group distance:");
-        midPanel.add(label3);
-
-        text3 = new JTextField();
-        text3.setMaximumSize(new Dimension(300,30));
-        text3.setText(Integer.toString(defaultPointGroupDistance));
-        text3.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                text3.setText(text3.getText().trim());
-                try {
-                    windowControl.setPointGroupDistance(Integer.parseInt(text3.getText()));
-                    setFormValuesValidity(true);
-                } catch(Exception ex) {
-                    setFormValuesValidity(false);
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-            }
-        });
-        midPanel.add(text3);
+        
+        addLabelAndTextField(midPanel, label1, text1, "Line width:", Integer.toString(defaultLineWidth), windowControl::setLineWidth);
+        addLabelAndTextField(midPanel, label2, text2, "Robots number:", Integer.toString(defaultRobotsNumber), windowControl::setRobotsNumber);
+        addLabelAndTextField(midPanel, label3, text3, "Point group distance:", Integer.toString(defaultPointGroupDistance), windowControl::setPointGroupDistance);
 
         textWarning = new JLabel("All fields must be 32 bit integers!");
         textWarning.setForeground(Color.RED);
@@ -253,5 +177,37 @@ public class MainProgramWindow {
     private void setFormValuesValidity(boolean valid) {
         validFormValues = valid;
         textWarning.setVisible(!valid);
+    }
+    
+    private void addLabelAndTextField(JComponent panel, JLabel label, JTextField textField, String labelText, String defaultTextFieldText, Consumer<Integer> func) {
+        label = new JLabel(labelText);
+        panel.add(label);
+
+        textField = new JTextField();
+        textField.setMaximumSize(new Dimension(300,30));
+        textField.setText(defaultTextFieldText);
+        
+        textField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                JTextField sender = (JTextField)e.getComponent();
+                sender.setText(sender.getText().trim());
+                try {
+                    func.accept(Integer.parseInt(sender.getText()));
+                    setFormValuesValidity(true);
+                } catch(Exception ex) {
+                    setFormValuesValidity(false);
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+        });
+        panel.add(textField);
     }
 }
