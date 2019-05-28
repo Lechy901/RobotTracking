@@ -62,7 +62,7 @@ public class MainProgramWindow {
         windowControl = wc;
 
         window = new JFrame(caption);
-        window.setSize(1500, 900);
+        window.setSize(1400, 900);
 
         // close the app when the window is closed
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -127,7 +127,15 @@ public class MainProgramWindow {
             }
         });
         botPanel.add(but2, "West");
-        botPanel.add(Box.createHorizontalGlue(), "Center");
+        
+        JButton but3 = new JButton("Pause");
+        but3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                windowControl.flipPaused();
+            }
+        });
+        botPanel.add(but3, "Center");
 
         window.getContentPane().add(botPanel, "South");
 

@@ -38,6 +38,7 @@ public class WindowControl {
     private Mat curFrameLeft, curFrameRight;
     private MainProgramWindow mpw;
     private int lineWidth, robotsNumber, pointGroupDistance;
+    private boolean paused;
 
     /**
      * A constructor, already opens the window
@@ -51,7 +52,7 @@ public class WindowControl {
         this.pointGroupDistance = pointGroupDistance;
         mpw = new MainProgramWindow("test", this, lineWidth, robotsNumber, pointGroupDistance);
         windowStage = WindowStage.NONE;
-        rt = new RobotTracker("data/06/cascade.xml");
+        rt = new RobotTracker("resources/06/cascade.xml");
         resetRightFrame();
     }
 
@@ -61,15 +62,21 @@ public class WindowControl {
     public void start() {
         curFrameLeft = new Mat();
         vc = new VideoCapture();
-        vc.open(0);
+        vc.open(1);
         if (!vc.isOpened()) {
             System.err.println("VideoCapture is not opened");
             vc.close();
             return;
         }
 
+        paused = false;
         windowStage = WindowStage.PAPER_SEARCH;
         while(true) {
+            if (paused) {
+                Thread.yield();
+                continue;
+            }
+                
             if(windowStage == WindowStage.PAPER_SEARCH) {
                 vc.read(curFrameLeft);
                 if (curFrameLeft.empty()) {
@@ -219,6 +226,10 @@ public class WindowControl {
         }
         windowStage = windowStage.prev();
         resetRightFrame();
+    }
+    
+    public void flipPaused() {
+        paused = !paused;
     }
 
     public void setLineWidth(int lineWidth) {

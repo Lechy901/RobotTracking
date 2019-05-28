@@ -28,6 +28,8 @@ public class RobotTracker {
      * @return An array of Rects representing the location of the robots in the image.
      */
     public Rect[] findRobots(Mat frame) {
+        if (frame == null || frame.empty())
+            System.out.println("empty frame passed to findRobots");
         RectVector r = new RectVector();
         cc.detectMultiScale(frame, r);
         return r.get();
