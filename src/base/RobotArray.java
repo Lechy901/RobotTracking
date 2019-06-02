@@ -29,10 +29,14 @@ public class RobotArray {
         List<Robot> availableRobots = Arrays.asList(robots);
     }
     
-    private List<Point> convertRectsToPoints(Rect[] positions, double topAndBotLineRatio) {
+    public List<Point> convertRectsToPoints(Rect[] positions, double topAndBotLineRatio) {
         List<Point> r = new ArrayList<Point>();
 
-        topAndBotLineRatio = topAndBotLineRatio * topAndBotLineRatio;
+        double k = 1 - (topAndBotLineRatio * topAndBotLineRatio * topAndBotLineRatio);
+        
+        for(Rect position : positions) {
+            r.add(new Point(position.x() + (position.width() / 2), position.y() + (int)(position.height() / 2) + (int)(position.height() * k / 2)));
+        }
         
         return r;
     }

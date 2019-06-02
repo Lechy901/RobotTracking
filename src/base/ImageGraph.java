@@ -2,12 +2,13 @@ package base;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
+
+import static org.bytedeco.javacpp.opencv_core.BORDER_CONSTANT;
+import static org.bytedeco.javacpp.opencv_imgproc.erode;
+import static org.bytedeco.javacpp.opencv_imgproc.morphologyDefaultBorderValue;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
-import org.bytedeco.javacpp.opencv_core.MatExpr;
 import org.bytedeco.javacpp.opencv_core.Point;
-import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.indexer.Indexer;
 
 import util.NoIntersectionException;
@@ -90,11 +91,14 @@ public class ImageGraph {
 
             nearestLeft = getNearest(current, left);
             nearestUp = getNearest(current, up);
+            
+            Mat eroded = new Mat();
+            erode(image, eroded, new Mat(), new Point(-1, -1), 3, BORDER_CONSTANT, morphologyDefaultBorderValue());
 
-            if (nearestUp != null && areConnectedByEdge(current, nearestUp, image)) {
+            if (nearestUp != null && areConnectedByEdge(current, nearestUp, eroded)) {
                 edges.add(new Pair<Point, Point>(current, nearestUp));
             }
-            if (nearestLeft != null && areConnectedByEdge(current, nearestLeft, image)) {
+            if (nearestLeft != null && areConnectedByEdge(current, nearestLeft, eroded)) {
                 edges.add(new Pair<Point, Point>(current, nearestLeft));
             }
 
@@ -177,7 +181,7 @@ public class ImageGraph {
             }	
         }
 
-        if (((double)numberOfWhitePixels / (double)numberOfSteps) > 0.7) {
+        if (((double)numberOfWhitePixels / (double)numberOfSteps) > 0.4) {
             return false;
         }
 

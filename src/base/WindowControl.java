@@ -166,11 +166,15 @@ public class WindowControl {
                 Rect[] r = rt.findRobots(gray);
 
                 ra.updateRobotPositions(r, topAndBotLineRatio);
+                List<Point> positions = ra.convertRectsToPoints(r, topAndBotLineRatio);
                 for(Rect rr : r) {
                     rectangle(warped, rr, new Scalar(0, 0, 255, 255));
                     Point center = new Point(rr.x() + rr.width() / 2, rr.y() + rr.height() / 2);
                     Point robotPosition = ig.getRobotPositionInGraph(center);
                     circle(curFrameRight, robotPosition, 8, new Scalar(0, 255, 255, 255));
+                }
+                for(Point p : positions) {
+                    circle(warped, p, 8, new Scalar(255, 0, 0, 255));
                 }
                 mpw.showImage(warped, true);
                 mpw.showImage(curFrameRight, false);
