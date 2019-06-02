@@ -18,7 +18,7 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
  */
 public class ImageWindow {
 
-    private OpenCVFrameConverter<Mat> converter;
+    private OpenCVFrameConverter converter;
     private CanvasFrame canvas;
 
     /**

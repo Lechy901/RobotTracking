@@ -1,182 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build" name="robot_tracking">
-    <!-- https://mvnrepository.com/artifact/org.bytedeco/javacv -->
-    <dependency>
-        <groupId>org.bytedeco</groupId>
-        <artifactId>javacv</artifactId>
-        <version>1.5</version>
-    </dependency>
+<project xmlns:ivy="antlib:org.apache.ivy.ant" basedir="." default="compile" name="robot_tracking">
+    <property name="src" value="src"/>
+    <property name="bin" value="bin"/>
 
-    <property environment="env"/>
-    <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.8"/>
-    <property name="source" value="1.8"/>
-    <path id="robot_tracking.classpath">
-        <pathelement location="bin"/>
-        <pathelement location="lib/artoolkitplus.jar"/>
-        <pathelement location="lib/artoolkitplus-android-arm.jar"/>
-        <pathelement location="lib/artoolkitplus-android-arm64.jar"/>
-        <pathelement location="lib/artoolkitplus-android-x86.jar"/>
-        <pathelement location="lib/artoolkitplus-android-x86_64.jar"/>
-        <pathelement location="lib/artoolkitplus-linux-armhf.jar"/>
-        <pathelement location="lib/artoolkitplus-linux-ppc64le.jar"/>
-        <pathelement location="lib/artoolkitplus-linux-x86.jar"/>
-        <pathelement location="lib/artoolkitplus-linux-x86_64.jar"/>
-        <pathelement location="lib/artoolkitplus-macosx-x86_64.jar"/>
-        <pathelement location="lib/artoolkitplus-platform.jar"/>
-        <pathelement location="lib/artoolkitplus-windows-x86.jar"/>
-        <pathelement location="lib/artoolkitplus-windows-x86_64.jar"/>
-        <pathelement location="lib/ffmpeg.jar"/>
-        <pathelement location="lib/ffmpeg-android-arm.jar"/>
-        <pathelement location="lib/ffmpeg-android-arm64.jar"/>
-        <pathelement location="lib/ffmpeg-android-x86.jar"/>
-        <pathelement location="lib/ffmpeg-android-x86_64.jar"/>
-        <pathelement location="lib/ffmpeg-linux-armhf.jar"/>
-        <pathelement location="lib/ffmpeg-linux-ppc64le.jar"/>
-        <pathelement location="lib/ffmpeg-linux-x86.jar"/>
-        <pathelement location="lib/ffmpeg-linux-x86_64.jar"/>
-        <pathelement location="lib/ffmpeg-macosx-x86_64.jar"/>
-        <pathelement location="lib/ffmpeg-platform.jar"/>
-        <pathelement location="lib/ffmpeg-windows-x86.jar"/>
-        <pathelement location="lib/ffmpeg-windows-x86_64.jar"/>
-        <pathelement location="lib/flandmark.jar"/>
-        <pathelement location="lib/flandmark-android-arm.jar"/>
-        <pathelement location="lib/flandmark-android-arm64.jar"/>
-        <pathelement location="lib/flandmark-android-x86.jar"/>
-        <pathelement location="lib/flandmark-android-x86_64.jar"/>
-        <pathelement location="lib/flandmark-linux-armhf.jar"/>
-        <pathelement location="lib/flandmark-linux-ppc64le.jar"/>
-        <pathelement location="lib/flandmark-linux-x86.jar"/>
-        <pathelement location="lib/flandmark-linux-x86_64.jar"/>
-        <pathelement location="lib/flandmark-macosx-x86_64.jar"/>
-        <pathelement location="lib/flandmark-platform.jar"/>
-        <pathelement location="lib/flandmark-windows-x86.jar"/>
-        <pathelement location="lib/flandmark-windows-x86_64.jar"/>
-        <pathelement location="lib/flycapture.jar"/>
-        <pathelement location="lib/flycapture-linux-armhf.jar"/>
-        <pathelement location="lib/flycapture-linux-x86.jar"/>
-        <pathelement location="lib/flycapture-linux-x86_64.jar"/>
-        <pathelement location="lib/flycapture-platform.jar"/>
-        <pathelement location="lib/flycapture-windows-x86.jar"/>
-        <pathelement location="lib/flycapture-windows-x86_64.jar"/>
-        <pathelement location="lib/javacpp.jar"/>
-        <pathelement location="lib/javacv.jar"/>
-        <pathelement location="lib/javacv-platform.jar"/>
-        <pathelement location="lib/leptonica.jar"/>
-        <pathelement location="lib/leptonica-android-arm.jar"/>
-        <pathelement location="lib/leptonica-android-arm64.jar"/>
-        <pathelement location="lib/leptonica-android-x86.jar"/>
-        <pathelement location="lib/leptonica-android-x86_64.jar"/>
-        <pathelement location="lib/leptonica-linux-armhf.jar"/>
-        <pathelement location="lib/leptonica-linux-ppc64le.jar"/>
-        <pathelement location="lib/leptonica-linux-x86.jar"/>
-        <pathelement location="lib/leptonica-linux-x86_64.jar"/>
-        <pathelement location="lib/leptonica-macosx-x86_64.jar"/>
-        <pathelement location="lib/leptonica-platform.jar"/>
-        <pathelement location="lib/leptonica-windows-x86.jar"/>
-        <pathelement location="lib/leptonica-windows-x86_64.jar"/>
-        <pathelement location="lib/libdc1394.jar"/>
-        <pathelement location="lib/libdc1394-linux-armhf.jar"/>
-        <pathelement location="lib/libdc1394-linux-ppc64le.jar"/>
-        <pathelement location="lib/libdc1394-linux-x86.jar"/>
-        <pathelement location="lib/libdc1394-linux-x86_64.jar"/>
-        <pathelement location="lib/libdc1394-macosx-x86_64.jar"/>
-        <pathelement location="lib/libdc1394-platform.jar"/>
-        <pathelement location="lib/libdc1394-windows-x86.jar"/>
-        <pathelement location="lib/libdc1394-windows-x86_64.jar"/>
-        <pathelement location="lib/libfreenect.jar"/>
-        <pathelement location="lib/libfreenect2.jar"/>
-        <pathelement location="lib/libfreenect2-linux-x86.jar"/>
-        <pathelement location="lib/libfreenect2-linux-x86_64.jar"/>
-        <pathelement location="lib/libfreenect2-macosx-x86_64.jar"/>
-        <pathelement location="lib/libfreenect2-platform.jar"/>
-        <pathelement location="lib/libfreenect2-windows-x86_64.jar"/>
-        <pathelement location="lib/libfreenect-linux-armhf.jar"/>
-        <pathelement location="lib/libfreenect-linux-ppc64le.jar"/>
-        <pathelement location="lib/libfreenect-linux-x86.jar"/>
-        <pathelement location="lib/libfreenect-linux-x86_64.jar"/>
-        <pathelement location="lib/libfreenect-macosx-x86_64.jar"/>
-        <pathelement location="lib/libfreenect-platform.jar"/>
-        <pathelement location="lib/libfreenect-windows-x86.jar"/>
-        <pathelement location="lib/libfreenect-windows-x86_64.jar"/>
-        <pathelement location="lib/librealsense.jar"/>
-        <pathelement location="lib/librealsense-linux-x86.jar"/>
-        <pathelement location="lib/librealsense-linux-x86_64.jar"/>
-        <pathelement location="lib/librealsense-macosx-x86_64.jar"/>
-        <pathelement location="lib/librealsense-platform.jar"/>
-        <pathelement location="lib/librealsense-windows-x86.jar"/>
-        <pathelement location="lib/librealsense-windows-x86_64.jar"/>
-        <pathelement location="lib/opencv.jar"/>
-        <pathelement location="lib/opencv-android-arm.jar"/>
-        <pathelement location="lib/opencv-android-arm64.jar"/>
-        <pathelement location="lib/opencv-android-x86.jar"/>
-        <pathelement location="lib/opencv-android-x86_64.jar"/>
-        <pathelement location="lib/opencv-ios-arm64.jar"/>
-        <pathelement location="lib/opencv-ios-x86_64.jar"/>
-        <pathelement location="lib/opencv-linux-armhf.jar"/>
-        <pathelement location="lib/opencv-linux-ppc64le.jar"/>
-        <pathelement location="lib/opencv-linux-x86.jar"/>
-        <pathelement location="lib/opencv-linux-x86_64.jar"/>
-        <pathelement location="lib/opencv-macosx-x86_64.jar"/>
-        <pathelement location="lib/opencv-platform.jar"/>
-        <pathelement location="lib/opencv-windows-x86.jar"/>
-        <pathelement location="lib/opencv-windows-x86_64.jar"/>
-        <pathelement location="lib/tesseract.jar"/>
-        <pathelement location="lib/tesseract-android-arm.jar"/>
-        <pathelement location="lib/tesseract-android-arm64.jar"/>
-        <pathelement location="lib/tesseract-android-x86.jar"/>
-        <pathelement location="lib/tesseract-android-x86_64.jar"/>
-        <pathelement location="lib/tesseract-linux-armhf.jar"/>
-        <pathelement location="lib/tesseract-linux-ppc64le.jar"/>
-        <pathelement location="lib/tesseract-linux-x86.jar"/>
-        <pathelement location="lib/tesseract-linux-x86_64.jar"/>
-        <pathelement location="lib/tesseract-macosx-x86_64.jar"/>
-        <pathelement location="lib/tesseract-platform.jar"/>
-        <pathelement location="lib/tesseract-windows-x86.jar"/>
-        <pathelement location="lib/tesseract-windows-x86_64.jar"/>
-        <pathelement location="lib/videoinput.jar"/>
-        <pathelement location="lib/videoinput-platform.jar"/>
-        <pathelement location="lib/videoinput-windows-x86.jar"/>
-        <pathelement location="lib/videoinput-windows-x86_64.jar"/>
-    </path>
     <target name="init">
-        <mkdir dir="bin"/>
-        <copy includeemptydirs="false" todir="bin">
-            <fileset dir="src">
-                <exclude name="**/*.java"/>
-            </fileset>
-        </copy>
+        <tstamp/>
+        <mkdir dir="${bin}"/>
     </target>
-    <target name="clean">
-        <delete dir="bin"/>
+
+    <target name="resolve">
+        <ivy:resolve/>
+        <ivy:cachepath pathid="robot_tracking.classpath"/>
     </target>
-    <target depends="clean" name="cleanall"/>
-    <target depends="build-subprojects,build-project" name="build"/>
-    <target name="build-subprojects"/>
-    <target depends="init" name="build-project">
-        <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
-            <src path="src"/>
-            <classpath refid="robot_tracking.classpath"/>
+    
+    <target name="compile" depends="init,resolve">
+        <javac destdir="${bin}" includeantruntime="false" classpathref="robot_tracking.classpath">
+            <src path="${src}"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
-    </target>
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
-    </target>
-    <target name="TrackingMain">
-        <java classname="main.TrackingMain" failonerror="true" fork="yes">
-            <classpath refid="robot_tracking.classpath"/>
-        </java>
+    
+    <target name="clean">
+        <delete dir="${bin}"/>
     </target>
 </project>

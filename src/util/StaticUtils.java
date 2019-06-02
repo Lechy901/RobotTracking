@@ -254,12 +254,7 @@ public class StaticUtils {
             return null;
         }
         biggestSquare = sortSquareClockWise(biggestSquare);
-        for (Point p : biggestSquare) {
-            System.out.println(p.x() + " " + p.y());
-            //circle(image, p, 6, new Scalar());
-        }
-        System.out.println("done");
-
+        
         Mat srcMat = pointsToMat(biggestSquare);
         List<Point> to = new ArrayList<Point>();
         to.add(new Point(0, 0));
@@ -478,7 +473,7 @@ public class StaticUtils {
      * @param square The square to be sorted
      * @return The sorted square
      */
-    private static List<Point> sortSquareClockWise(List<Point> square) {
+    public static List<Point> sortSquareClockWise(List<Point> square) {
         List<Point> r = new ArrayList<Point>(4);
         r.add(square.stream().min((a, b) -> { // upper left
             if (a.x() + a.y() < b.x() + b.y()) {

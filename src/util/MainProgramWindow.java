@@ -62,7 +62,7 @@ public class MainProgramWindow {
         windowControl = wc;
 
         window = new JFrame(caption);
-        window.setSize(1400, 900);
+        window.setSize(1400, 800);
 
         // close the app when the window is closed
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

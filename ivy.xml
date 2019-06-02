@@ -1,0 +1,11 @@
+<ivy-module version="2.0">
+    <info organisation="ALechovsky" module="robot_tracking"/>
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.bytedeco/javacv -->
+        <dependency org="org.bytedeco" name="javacv" rev="1.5"/>
+        <!-- https://mvnrepository.com/artifact/org.bytedeco.javacpp-presets/opencv -->
+        <dependency org="org.bytedeco.javacpp-presets" name="opencv" rev="4.0.1-1.4.4"/>
+
+
+    </dependencies>
+</ivy-module>

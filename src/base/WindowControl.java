@@ -1,6 +1,7 @@
 package base;
 
 import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
+import static org.bytedeco.javacpp.opencv_core.normalize;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2GRAY;
 import static org.bytedeco.javacpp.opencv_imgproc.circle;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
@@ -17,6 +18,7 @@ import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_videoio.VideoCapture;
+import org.bytedeco.javacpp.indexer.Indexer;
 
 import util.MainProgramWindow;
 import util.Pair;
@@ -35,6 +37,9 @@ public class WindowControl {
     private RobotTracker rt;
     private Mat transformation;
     private ImageGraph ig;
+    private RobotArray ra;
+    private double topAndBotLineRatio;
+    
     private Mat curFrameLeft, curFrameRight;
     private MainProgramWindow mpw;
     private int lineWidth, robotsNumber, pointGroupDistance;
@@ -50,6 +55,7 @@ public class WindowControl {
         this.lineWidth = lineWidth;
         this.robotsNumber = robotsNumber;
         this.pointGroupDistance = pointGroupDistance;
+        ra = null;
         mpw = new MainProgramWindow("test", this, lineWidth, robotsNumber, pointGroupDistance);
         windowStage = WindowStage.NONE;
         rt = new RobotTracker("resources/06/cascade.xml");
@@ -76,13 +82,14 @@ public class WindowControl {
                 Thread.yield();
                 continue;
             }
-                
+
+            vc.read(curFrameLeft);
+            if (curFrameLeft.empty()) {
+                System.err.println("empty frame grabbed");
+                continue;
+            }
+            
             if(windowStage == WindowStage.PAPER_SEARCH) {
-                vc.read(curFrameLeft);
-                if (curFrameLeft.empty()) {
-                    System.out.println("empty frame grabbed wtf");
-                    continue;
-                }
                 // find all squares in the image
                 List<List<Point>> squares = new ArrayList<List<Point>>();
                 StaticUtils.findSquares(curFrameLeft, squares);
@@ -100,14 +107,12 @@ public class WindowControl {
                     line(curFrameLeft, square.get(i), square.get((i + 1) % square.size()), new Scalar(0, 0, 255, 255), 3, 8, 0);
                 }
                 mpw.showImage(curFrameLeft, true);
+
+                List<Point> clockwise = StaticUtils.sortSquareClockWise(square);
+                topAndBotLineRatio = StaticUtils.dist(clockwise.get(0), clockwise.get(1)) / StaticUtils.dist(clockwise.get(2), clockwise.get(3));
             }
 
             if(windowStage == WindowStage.GRAPH_SEARCH) {
-                vc.read(curFrameLeft);
-                if (curFrameLeft.empty()) {
-                    System.err.println("empty frame grabbed");
-                    continue;
-                }
                 if (transformation == null) {
                     continue;
                 }
@@ -143,9 +148,7 @@ public class WindowControl {
             }
 
             if(windowStage == WindowStage.ROBOT_TRACKING) {
-                vc.read(curFrameLeft);
-                if (curFrameLeft.empty()) {
-                    System.out.println("empty frame grabbed wtf");
+                if (ra == null) {
                     continue;
                 }
 
@@ -161,6 +164,8 @@ public class WindowControl {
                 // find robots and draw them into the right image
                 cvtColor(warped, gray, CV_BGR2GRAY);
                 Rect[] r = rt.findRobots(gray);
+
+                ra.updateRobotPositions(r, topAndBotLineRatio);
                 for(Rect rr : r) {
                     rectangle(warped, rr, new Scalar(0, 0, 255, 255));
                     Point center = new Point(rr.x() + rr.width() / 2, rr.y() + rr.height() / 2);
@@ -182,6 +187,8 @@ public class WindowControl {
                 resetRightFrame();
                 return;
             }
+            
+            ra = new RobotArray(robotsNumber);
 
             Mat warped = new Mat();
             warpPerspective(curFrameLeft, warped, transformation, new Size(curFrameLeft.cols(), curFrameLeft.rows()));
@@ -220,9 +227,10 @@ public class WindowControl {
     public void prevStage() {
         if (windowStage == WindowStage.PAPER_SEARCH) {
             ig = null;
-        }
-        if (windowStage == WindowStage.GRAPH_SEARCH) {
+        } else if (windowStage == WindowStage.GRAPH_SEARCH) {
             transformation = null;
+        } else if (windowStage == WindowStage.ROBOT_TRACKING) {
+            ra = null;
         }
         windowStage = windowStage.prev();
         resetRightFrame();
