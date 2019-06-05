@@ -98,7 +98,7 @@ public class WindowControl {
                     // find the biggest square
                     square = StaticUtils.getBiggestSquare(squares);
                 } catch (IllegalArgumentException ex) {
-                    mpw.showImage(curFrameLeft, true);
+                    mpw.showImage(curFrameLeft, true, true);
                     continue;
                 }
 
@@ -106,7 +106,7 @@ public class WindowControl {
                 for(int i = 0; i < square.size(); i++) {
                     line(curFrameLeft, square.get(i), square.get((i + 1) % square.size()), new Scalar(0, 0, 255, 255), 3, 8, 0);
                 }
-                mpw.showImage(curFrameLeft, true);
+                mpw.showImage(curFrameLeft, true, true);
 
                 List<Point> clockwise = StaticUtils.sortSquareClockWise(square);
                 topAndBotLineRatio = StaticUtils.dist(clockwise.get(0), clockwise.get(1)) / StaticUtils.dist(clockwise.get(2), clockwise.get(3));
@@ -144,7 +144,7 @@ public class WindowControl {
                     line(warped, edge.first, edge.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
                 }
 
-                mpw.showImage(warped, true);
+                mpw.showImage(warped, true, true);
             }
 
             if(windowStage == WindowStage.ROBOT_TRACKING) {
@@ -163,21 +163,19 @@ public class WindowControl {
 
                 // find robots and draw them into the right image
                 cvtColor(warped, gray, CV_BGR2GRAY);
-                Rect[] r = rt.findRobots(gray);
+                RobotPositions rp = ra.findRobotsInImage(gray, topAndBotLineRatio);
 
-                ra.updateRobotPositions(r, topAndBotLineRatio);
-                List<Point> positions = ra.convertRectsToPoints(r, topAndBotLineRatio);
-                for(Rect rr : r) {
+                for(Rect rr : rp.boundaries) {
                     rectangle(warped, rr, new Scalar(0, 0, 255, 255));
-                    Point center = new Point(rr.x() + rr.width() / 2, rr.y() + rr.height() / 2);
-                    Point robotPosition = ig.getRobotPositionInGraph(center);
-                    circle(curFrameRight, robotPosition, 8, new Scalar(0, 255, 255, 255));
                 }
-                for(Point p : positions) {
-                    circle(warped, p, 8, new Scalar(255, 0, 0, 255));
+                for(Point center : rp.centers) {
+                    circle(warped, center, 8, new Scalar(255, 0, 0, 255));
                 }
-                mpw.showImage(warped, true);
-                mpw.showImage(curFrameRight, false);
+                for(Point positionInGraph : rp.positionsInGraph) {
+                    circle(curFrameRight, positionInGraph, 8, new Scalar(0, 255, 255, 255));
+                }
+                mpw.showImage(warped, true, false);
+                mpw.showImage(curFrameRight, false, true);
             }
         }
     }
@@ -191,8 +189,6 @@ public class WindowControl {
                 resetRightFrame();
                 return;
             }
-            
-            ra = new RobotArray(robotsNumber);
 
             Mat warped = new Mat();
             warpPerspective(curFrameLeft, warped, transformation, new Size(curFrameLeft.cols(), curFrameLeft.rows()));
@@ -210,8 +206,10 @@ public class WindowControl {
             for (Pair<Point, Point> edge : ig.edges) {
                 line(curFrameRight, edge.first, edge.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
             }
+            
+            ra = new RobotArray(robotsNumber, rt, ig);
 
-            mpw.showImage(curFrameRight, false);
+            mpw.showImage(curFrameRight, false, true);
         }
 
         if (windowStage == WindowStage.PAPER_SEARCH) {
@@ -258,6 +256,6 @@ public class WindowControl {
 
     private void resetRightFrame() {
         curFrameRight = new Mat(480, 640, CV_8UC3, new Scalar(0));
-        mpw.showImage(curFrameRight, false);
+        mpw.showImage(curFrameRight, false, true);
     }
 }

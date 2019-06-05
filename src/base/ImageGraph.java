@@ -181,7 +181,7 @@ public class ImageGraph {
             }	
         }
 
-        if (((double)numberOfWhitePixels / (double)numberOfSteps) > 0.4) {
+        if (((double)numberOfWhitePixels / (double)numberOfSteps) > 0.3) {
             return false;
         }
 

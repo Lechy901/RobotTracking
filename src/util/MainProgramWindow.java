@@ -147,14 +147,16 @@ public class MainProgramWindow {
      * @param image The new image to be shown
      * @param left true = show image in the left JLabel, false = show image in the right JLabel
      */
-    public void showImage(Mat image, boolean left) {
+    public void showImage(Mat image, boolean left, boolean repaint) {
         // Show image on window.
         if (left) {
             iconLeft.setImage(createAwtImage(image));
         } else {
             iconRight.setImage(createAwtImage(image));
         }
-        window.repaint();
+        if (repaint) {
+            window.repaint();
+        }
     }
 
     /**
