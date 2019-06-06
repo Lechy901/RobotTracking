@@ -1,0 +1,50 @@
+
+1. Úvod
+	- uvedení do problematiky
+	- stručný popis mého řešení
+		- mnou vybrané technologie - Java, OpenCV, Swing
+	- rozdělení na podproblémy
+		- detekce papíru/grafu
+		- sledování robotů
+	- stanovení konkrétních požadavků na můj program
+	- stručný přehled příbuzných prací
+
+2. Analýza problému
+	- popis zvolených technologií a důvodů k jejich zvolení
+		- Java + Swing
+		- OpenCV
+	- popis a hodnocení možných přístupů k řešení vzniklých problémů
+		- detekce papíru
+		- detekce grafu
+			- detekce hran
+			- seskupování hran
+			- získání vrcholů z průsečíků hran
+			- zpětné spojování vrcholů do hran
+		- sledování robotů
+			- zdali použít OpenCV "objdetect" či "tracking" knihovnu
+			- trénování kaskády
+
+3. Vývojová dokumentace
+	- popis kódu
+		- důležité třídy
+		- hierarchie mezi třídami
+			- struktura volání, referencí
+		- použité algoritmy a důvod k jejich použití, stručný popis jejich fungování
+			- funkce z OpenCV
+			- mnou napsané algoritmy pro řešení dílčích problémů
+	- popis formátu výstupního souboru
+
+4. Uživatelská dokumentace
+	- návod na kompilaci programu
+	- návod na použití programu
+		- popis GUI
+		- popis parametrů na příkazové řádce
+
+5. Experiment
+	- pro objektivní ohodnocení jak spolehlivě program funguje
+	- stanovení hypotéz
+	- popis experimentu samotného
+	- nasbíraná data
+	- interpretace dat, vyhodnocení hypotéz
+
+6. Závěr
