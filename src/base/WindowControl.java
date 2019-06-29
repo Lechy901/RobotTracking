@@ -164,6 +164,10 @@ public class WindowControl {
                 // find robots and draw them into the right image
                 cvtColor(warped, gray, CV_BGR2GRAY);
                 RobotPositions rp = ra.findRobotsInImage(gray, topAndBotLineRatio);
+                
+                if (rp == null) {
+                    continue;
+                }
 
                 for(Rect rr : rp.boundaries) {
                     rectangle(warped, rr, new Scalar(0, 0, 255, 255));
@@ -218,6 +222,10 @@ public class WindowControl {
                 return;
             }
             ig = null;
+        }
+        
+        if (windowStage == WindowStage.ROBOT_TRACKING) {
+            
         }
 
         windowStage = windowStage.next();

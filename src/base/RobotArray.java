@@ -30,13 +30,17 @@ public class RobotArray {
     
     public RobotPositions findRobotsInImage(Mat image, double topAndBotLineRatio) {
         Rect[] robots = tracker.findRobots(image);
+        Rect[] robotsFixed = fixRobotPositions(robots);
+        if (robotsFixed == null) {
+            return null;
+        }
         List<Point> robotCenters = convertRectsToPoints(robots, topAndBotLineRatio);
         List<Point> robotsInGraph = updateRobotPositions(robotCenters, topAndBotLineRatio);
         
         printAllRobotPositions();
         return new RobotPositions(robots, robotCenters, robotsInGraph);
     }
-    
+
     public List<Point> updateRobotPositions(List<Point> positions, double topAndBotLineRatio) {
         
         List<Point> availablePositions = positions;
@@ -75,13 +79,24 @@ public class RobotArray {
                 continue;
             
             availableRobots.remove(nearestRobot);
-            Point nearestRobotInGraph = graph.getRobotPositionInGraph(pos);
+            Pair<Point, Boolean> nearestRobotInGraph = graph.getRobotPositionInGraph(pos);
             nearestRobot.setLastKnownPosition(pos);
-            nearestRobot.setLastKnownIntersectionInGraph(nearestRobotInGraph);
-            robotsInGraph.add(nearestRobotInGraph);
+            nearestRobot.setLastKnownIntersectionInGraph(nearestRobotInGraph.first);
+            if (nearestRobotInGraph.second) {
+                nearestRobot.addPointToHistory(nearestRobotInGraph.first);
+            }
+            robotsInGraph.add(nearestRobotInGraph.first);
         }
         
         return robotsInGraph;
+    }
+    
+    private Rect[] fixRobotPositions(Rect[] positions) {
+        if (positions.length == robots.length)
+            return positions;
+        if (positions.length < robots.length)
+            return null;
+        return null;
     }
     
     private List<Point> convertRectsToPoints(Rect[] positions, double topAndBotLineRatio) {

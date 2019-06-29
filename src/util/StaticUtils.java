@@ -84,7 +84,7 @@ public class StaticUtils {
 
         for(Pair<Point, Point> line : input) {
             double lineAngle = angle(line.first, line.second, new Point(line.first.x() - 1, line.first.y()));
-            if (lineAngle < 0.1) {
+            if (lineAngle < 0.15) {
                 vertical_temp.add(line);
             } else if (lineAngle > 0.9) {
                 horizontal_temp.add(line);
@@ -141,7 +141,7 @@ public class StaticUtils {
             }
             last_x = vertical_temp.get(i).first.x();
         }
-
+        
         horizontal_temp.sort((a, b) -> {
             return a.first.y() - b.first.y();
         });
@@ -191,6 +191,21 @@ public class StaticUtils {
                 }
             }
             last_y = horizontal_temp.get(i).first.y();
+        }
+        // filter out lines near the edges of the image
+        filterBorderLines(vertical);
+        filterBorderLines(horizontal);
+    }
+    
+    private static void filterBorderLines(List<Pair<Point, Point>> lines) {
+        List<Pair<Point, Point>> linesToRemove = new ArrayList<Pair<Point, Point>>();
+        for (Pair<Point, Point> line : lines) {
+            if (line.first.x() < 20 || line.second.x() > 620 || line.first.y() < 20 || line.second.y() > 460) {
+                linesToRemove.add(line);
+            }
+        }
+        for (Pair<Point, Point> line : lines) {
+            lines.remove(line);
         }
     }
 

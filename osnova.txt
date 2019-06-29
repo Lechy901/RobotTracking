@@ -7,7 +7,8 @@
 		- detekce papíru/grafu
 		- sledování robotů
 	- stanovení konkrétních požadavků na můj program
-	- stručný přehled příbuzných prací
+
+1,5. Background + related works
 
 2. Analýza problému
 	- popis zvolených technologií a důvodů k jejich zvolení
@@ -40,11 +41,13 @@
 		- popis GUI
 		- popis parametrů na příkazové řádce
 
-5. Experiment
+5. Výsledky experimentů
 	- pro objektivní ohodnocení jak spolehlivě program funguje
 	- stanovení hypotéz
 	- popis experimentu samotného
+		- rozdělení na detekci grafu a robotů
 	- nasbíraná data
 	- interpretace dat, vyhodnocení hypotéz
 
 6. Závěr
+	- shrnutí plus otevřené otázky
