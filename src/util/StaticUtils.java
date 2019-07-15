@@ -53,7 +53,7 @@ public class StaticUtils {
             erode(gray, dilated, new Mat(), new Point(-1, -1), -1 * dilateIterations, BORDER_CONSTANT, morphologyDefaultBorderValue());
         } 
         Canny(dilated, edges, 50, 150, 3, false);
-        HoughLinesP(edges, lines, 1, Math.PI / 180, 40, 10, 0);
+        HoughLinesP(edges, lines, 1, Math.PI / 180, 30, 5, 0);
 
         List<Pair<Point, Point>> r = new ArrayList<Pair<Point, Point>>();
         if (lines.isNull() || lines.rows() == 0) {
@@ -204,7 +204,7 @@ public class StaticUtils {
                 linesToRemove.add(line);
             }
         }
-        for (Pair<Point, Point> line : lines) {
+        for (Pair<Point, Point> line : linesToRemove) {
             lines.remove(line);
         }
     }
@@ -217,6 +217,11 @@ public class StaticUtils {
      * @return The grouped List of Points
      */
     public static List<Point> groupPoints(List<Point> points, double threshold) {
+        
+        if (threshold < 1) {
+            return points;
+        }
+        
         List<Point> r = new ArrayList<Point>();
 
         while(!points.isEmpty()) {

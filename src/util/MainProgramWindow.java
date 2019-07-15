@@ -26,10 +26,12 @@ import javax.swing.WindowConstants;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.Scalar;
+import org.bytedeco.javacpp.opencv_core.Size;
 
 import base.WindowControl;
 
 import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
+import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
 
 /**
@@ -148,6 +150,9 @@ public class MainProgramWindow {
      * @param left true = show image in the left JLabel, false = show image in the right JLabel
      */
     public void showImage(Mat image, boolean left, boolean repaint) {
+        if (image.cols() > 640) {
+            resize(image, image, new Size(640, 480));
+        }
         // Show image on window.
         if (left) {
             iconLeft.setImage(createAwtImage(image));

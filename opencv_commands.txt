@@ -8,4 +8,4 @@ opencv_traincascade -data data -vec positives.vec -bg bg.txt -numPos 1750 -numNe
 
 opencv_createsamples -info annotations04.txt -num 1400 -w 40 -h 40 -vec positives.vec
 
-opencv_traincascade -data data -vec positives.vec -bg bg2.txt -numPos 1300 -numNeg 1400 -numStages 10 -w 40 -h 40 -maxFalseAlarmRate 0.4
+opencv_traincascade -data data -vec positives.vec -bg bg2.txt -numPos 1300 -numNeg 1400 -numStages 20 -w 40 -h 40 -maxFalseAlarmRate 0.4

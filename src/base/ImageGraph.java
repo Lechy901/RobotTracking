@@ -93,7 +93,7 @@ public class ImageGraph {
             nearestUp = getNearest(current, up);
             
             Mat eroded = new Mat();
-            erode(image, eroded, new Mat(), new Point(-1, -1), 4, BORDER_CONSTANT, morphologyDefaultBorderValue());
+            erode(image, eroded, new Mat(), new Point(-1, -1), 6, BORDER_CONSTANT, morphologyDefaultBorderValue());
 
             if (nearestUp != null && areConnectedByEdge(current, nearestUp, eroded)) {
                 edges.add(new Pair<Point, Point>(current, nearestUp));
@@ -111,14 +111,14 @@ public class ImageGraph {
      * @param p A Point to be used in the calculation
      * @return The Point which lies on the graph the closest to the given Point
      */
-    public Pair<Point, Boolean> getRobotPositionInGraph(Point p) {
+    public Pair<Point, Boolean> getRobotPositionInGraph(Point p, double vertexDist) {
         Point nearest = null;
         double nearestDist = Double.MAX_VALUE;
         
         // check vertices - these have priority
         Point nearestVertex = getNearest(p, vertices);
         double distToVertex = StaticUtils.dist(nearestVertex, p);
-        if (distToVertex < 20) {
+        if (distToVertex < vertexDist) {
             return new Pair<Point, Boolean>(nearestVertex, true);
         }
         

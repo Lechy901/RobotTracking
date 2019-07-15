@@ -8,6 +8,8 @@ package util;
  */
 
 public class ProgramArguments {
+    public int videoCapture = 0;
+    
     public boolean captureTrainImages = false;
     public int captureTrainImagesFileNumber = 0;
     public String captureTrainImagesDirPath = "bg";
@@ -24,5 +26,5 @@ public class ProgramArguments {
 
     public int lineWidth = 0;
     public int robotsNumber = 3;
-    public int pointGroupDistance = 20;
+    public int pointGroupDistance = 10;
 }

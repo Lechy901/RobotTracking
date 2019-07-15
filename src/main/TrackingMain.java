@@ -29,7 +29,7 @@ public class TrackingMain {
             return;
         }
 
-        WindowControl wc = new WindowControl(pa.lineWidth, pa.robotsNumber, pa.pointGroupDistance);
+        WindowControl wc = new WindowControl(pa.videoCapture, pa.lineWidth, pa.robotsNumber, pa.pointGroupDistance);
         wc.start();
     }
 
@@ -45,6 +45,9 @@ public class TrackingMain {
             String next = args[i + 1];
             try {
                 switch(args[i].toLowerCase()) {
+                case "-videocapture":
+                    r.videoCapture = Integer.parseInt(next);
+                    break;
                 case "-capturetrainimages":
                     r.captureTrainImages = Boolean.parseBoolean(next);
                     break;

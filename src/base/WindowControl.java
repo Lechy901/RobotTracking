@@ -1,13 +1,14 @@
 package base;
 
 import static org.bytedeco.javacpp.opencv_core.CV_8UC3;
-import static org.bytedeco.javacpp.opencv_core.normalize;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2GRAY;
 import static org.bytedeco.javacpp.opencv_imgproc.circle;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 import static org.bytedeco.javacpp.opencv_imgproc.line;
 import static org.bytedeco.javacpp.opencv_imgproc.rectangle;
 import static org.bytedeco.javacpp.opencv_imgproc.warpPerspective;
+import static org.bytedeco.javacpp.opencv_videoio.CAP_PROP_FRAME_HEIGHT;
+import static org.bytedeco.javacpp.opencv_videoio.CAP_PROP_FRAME_WIDTH;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +19,12 @@ import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_videoio.VideoCapture;
-import org.bytedeco.javacpp.indexer.Indexer;
 
 import util.MainProgramWindow;
 import util.Pair;
+import util.RobotPositions;
 import util.StaticUtils;
+import util.WindowStage;
 
 /**
  * A class which controls the content shown in the main window
@@ -41,8 +43,9 @@ public class WindowControl {
     private double topAndBotLineRatio;
     
     private Mat curFrameLeft, curFrameRight;
+    private int xSize, ySize;
     private MainProgramWindow mpw;
-    private int lineWidth, robotsNumber, pointGroupDistance;
+    private int videoCapture, lineWidth, robotsNumber, pointGroupDistance;
     private boolean paused;
 
     /**
@@ -51,10 +54,11 @@ public class WindowControl {
      * @param robotsNumber robots number
      * @param pointGroupDistance point group distance
      */
-    public WindowControl(int lineWidth, int robotsNumber, int pointGroupDistance) {
+    public WindowControl(int videoCapture, int lineWidth, int robotsNumber, int pointGroupDistance) {
         this.lineWidth = lineWidth;
         this.robotsNumber = robotsNumber;
         this.pointGroupDistance = pointGroupDistance;
+        this.videoCapture = videoCapture;
         ra = null;
         mpw = new MainProgramWindow("test", this, lineWidth, robotsNumber, pointGroupDistance);
         windowStage = WindowStage.NONE;
@@ -68,7 +72,7 @@ public class WindowControl {
     public void start() {
         curFrameLeft = new Mat();
         vc = new VideoCapture();
-        vc.open(1);
+        vc.open(videoCapture);
         if (!vc.isOpened()) {
             System.err.println("VideoCapture is not opened");
             vc.close();
@@ -88,6 +92,9 @@ public class WindowControl {
                 System.err.println("empty frame grabbed");
                 continue;
             }
+            
+            xSize = curFrameLeft.cols();
+            ySize = curFrameLeft.rows();
             
             if(windowStage == WindowStage.PAPER_SEARCH) {
                 // find all squares in the image
@@ -153,7 +160,7 @@ public class WindowControl {
                 }
 
                 // reset the right image and draw the graph again
-                curFrameRight = new Mat(480, 640, CV_8UC3, new Scalar(0));
+                curFrameRight = new Mat(ySize, xSize, CV_8UC3, new Scalar(0));
                 for (Pair<Point, Point> edge : ig.edges) {
                     line(curFrameRight, edge.first, edge.second, new Scalar(255, 0, 0, 255), 3, 8, 0);
                 }
@@ -163,23 +170,28 @@ public class WindowControl {
 
                 // find robots and draw them into the right image
                 cvtColor(warped, gray, CV_BGR2GRAY);
-                RobotPositions rp = ra.findRobotsInImage(gray, topAndBotLineRatio);
-                
-                if (rp == null) {
+                if (ra == null) {
                     continue;
                 }
+                RobotPositions rp = ra.findRobotsInImage(gray, topAndBotLineRatio);
+                
+                if (rp != null) {
+                    for(Rect rr : rp.boundaries) {
+                        rectangle(warped, rr, new Scalar(0, 0, 255, 255));
+                    }
+                    for(Point center : rp.centers) {
+                        circle(warped, center, 8, new Scalar(255, 0, 0, 255));
+                    }
+                    for(Point positionInGraph : rp.positionsInGraph) {
+                        circle(curFrameRight, positionInGraph, 8, new Scalar(0, 255, 255, 255));
+                    }
+                    
+                    mpw.showImage(warped, true, false);
+                    mpw.showImage(curFrameRight, false, true);
+                } else {
+                    mpw.showImage(warped, true, true);
+                }
 
-                for(Rect rr : rp.boundaries) {
-                    rectangle(warped, rr, new Scalar(0, 0, 255, 255));
-                }
-                for(Point center : rp.centers) {
-                    circle(warped, center, 8, new Scalar(255, 0, 0, 255));
-                }
-                for(Point positionInGraph : rp.positionsInGraph) {
-                    circle(curFrameRight, positionInGraph, 8, new Scalar(0, 255, 255, 255));
-                }
-                mpw.showImage(warped, true, false);
-                mpw.showImage(curFrameRight, false, true);
             }
         }
     }
@@ -225,7 +237,7 @@ public class WindowControl {
         }
         
         if (windowStage == WindowStage.ROBOT_TRACKING) {
-            
+            ra.printAllRobotHistories();
         }
 
         windowStage = windowStage.next();
