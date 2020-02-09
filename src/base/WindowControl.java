@@ -10,6 +10,9 @@ import static org.bytedeco.javacpp.opencv_imgproc.warpPerspective;
 import static org.bytedeco.javacpp.opencv_videoio.CAP_PROP_FRAME_HEIGHT;
 import static org.bytedeco.javacpp.opencv_videoio.CAP_PROP_FRAME_WIDTH;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +50,8 @@ public class WindowControl {
     private MainProgramWindow mpw;
     private int videoCapture, lineWidth, robotsNumber, pointGroupDistance;
     private boolean paused;
+    
+    private String mapExportPath;
 
     /**
      * A constructor, already opens the window
@@ -54,11 +59,12 @@ public class WindowControl {
      * @param robotsNumber robots number
      * @param pointGroupDistance point group distance
      */
-    public WindowControl(int videoCapture, int lineWidth, int robotsNumber, int pointGroupDistance) {
+    public WindowControl(int videoCapture, int lineWidth, int robotsNumber, int pointGroupDistance, String mapExportPath) {
         this.lineWidth = lineWidth;
         this.robotsNumber = robotsNumber;
         this.pointGroupDistance = pointGroupDistance;
         this.videoCapture = videoCapture;
+        this.mapExportPath = mapExportPath;
         ra = null;
         mpw = new MainProgramWindow("test", this, lineWidth, robotsNumber, pointGroupDistance);
         windowStage = WindowStage.NONE;
@@ -82,6 +88,7 @@ public class WindowControl {
         paused = false;
         windowStage = WindowStage.PAPER_SEARCH;
         while(true) {
+        	// main program loop
             if (paused) {
                 Thread.yield();
                 continue;
@@ -272,6 +279,46 @@ public class WindowControl {
 
     public void setPointGroupDistance(int pointGroupDistance) {
         this.pointGroupDistance = pointGroupDistance;
+    }
+    
+    public void exportMap() {
+    	BufferedWriter out = null;
+
+    	try {
+    	    FileWriter fstream = new FileWriter(mapExportPath);
+    	    out = new BufferedWriter(fstream);
+    	    
+    	    var graph = ig.getGraphInMapfFormat();
+    	    
+    	    out.write("type tile");
+    	    out.newLine();
+    	    out.write("height " + graph[0].length);
+    	    out.newLine();
+    	    out.write("width " + graph.length);
+    	    out.newLine();
+    	    out.write("map");
+    	    out.newLine();
+    	    
+    		for (int j = 0; j < graph[0].length; j++) {
+    			for (int i = 0; i < graph.length; i++) {
+        			out.write(graph[i][j]);
+        		}
+        		out.newLine();
+        	}
+    	}
+
+    	catch (IOException e) {
+    	    System.err.println("File writing error: " + e.getMessage());
+    	}
+
+    	finally {
+    	    if(out != null) {
+    	        try {
+					out.close();
+				} catch (IOException e) {
+				}
+    	    }
+    	}
     }
 
     private void resetRightFrame() {

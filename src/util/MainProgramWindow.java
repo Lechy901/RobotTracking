@@ -97,6 +97,14 @@ public class MainProgramWindow {
         addLabelAndTextField(midPanel, label1, text1, "Line width:", Integer.toString(defaultLineWidth), windowControl::setLineWidth);
         addLabelAndTextField(midPanel, label2, text2, "Robots number:", Integer.toString(defaultRobotsNumber), windowControl::setRobotsNumber);
         addLabelAndTextField(midPanel, label3, text3, "Point group distance:", Integer.toString(defaultPointGroupDistance), windowControl::setPointGroupDistance);
+        JButton butMap = new JButton("Export Map");
+        butMap.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				windowControl.exportMap();
+			}
+		});
+        midPanel.add(butMap);
 
         textWarning = new JLabel("All fields must be 32 bit integers!");
         textWarning.setForeground(Color.RED);

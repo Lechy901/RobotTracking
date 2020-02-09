@@ -29,7 +29,7 @@ public class TrackingMain {
             return;
         }
 
-        WindowControl wc = new WindowControl(pa.videoCapture, pa.lineWidth, pa.robotsNumber, pa.pointGroupDistance);
+        WindowControl wc = new WindowControl(pa.videoCapture, pa.lineWidth, pa.robotsNumber, pa.pointGroupDistance, pa.mapExportPath);
         wc.start();
     }
 
@@ -87,6 +87,9 @@ public class TrackingMain {
                 case "-pointgroupdistance":
                     r.pointGroupDistance = Integer.parseInt(next);
                     break;
+                case "-mapexportpath":
+                	r.mapExportPath = next;
+                	break;
                 default:
                     System.err.println("Unknown command line argument: " + args[i]);
                 }

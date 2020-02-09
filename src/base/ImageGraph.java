@@ -1,6 +1,7 @@
 package base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.bytedeco.javacpp.opencv_core.BORDER_CONSTANT;
@@ -31,6 +32,9 @@ public class ImageGraph {
      * A list of edges in the image 
      */
     public List<Pair<Point, Point>> edges;
+    
+    private int horizontalLinesNum = 0;
+    private int verticalLinesNum = 0;
 
     /**
      * A constructor which takes a list of horizontal lines and a list of vertical lines, calculates intersections of all vertical lines with all horizontal lines,
@@ -41,7 +45,10 @@ public class ImageGraph {
      * @param groupPointsThreshold The distance two points need to be apart in order to be grouped into one point
      */
     public ImageGraph(List<Pair<Point, Point>> horizontal, List<Pair<Point, Point>> vertical, Mat image, int groupPointsThreshold) {
-
+    	
+    	horizontalLinesNum = horizontal.size();
+    	verticalLinesNum = vertical.size();
+    	
         vertices = new ArrayList<Point>();
         edges = new ArrayList<Pair<Point, Point>>();
 
@@ -133,6 +140,121 @@ public class ImageGraph {
         }
 
         return new Pair<Point, Boolean>(nearest, false);
+    }
+    
+    public char[][] getGraphInMapfFormat() {
+    	Point[][] points = new Point[verticalLinesNum][horizontalLinesNum];
+    	
+    	Point[] verticesSortedHorizontal = new Point[vertices.size()];
+    	Point[] verticesSortedVertical = new Point[vertices.size()];
+    	verticesSortedHorizontal = vertices.toArray(verticesSortedHorizontal);
+    	verticesSortedVertical = vertices.toArray(verticesSortedVertical);
+    	
+    	Arrays.sort(verticesSortedHorizontal, (Point a, Point b) -> {
+    		if (a.x() < b.x())
+    			return -1;
+    		else if (a.x() == b.x())
+    			return 0;
+    		else
+    			return 1;
+    	});
+    	Arrays.sort(verticesSortedVertical, (Point a, Point b) -> {
+    		if (a.y() < b.y())
+    			return -1;
+    		else if (a.y() == b.y())
+    			return 0;
+    		else
+    			return 1;
+    	});
+    	
+    	List<Point> verticesSortedHorizontalWithoutEdges = new ArrayList<Point>();
+    	List<Point> verticesSortedVerticalWithoutEdges = new ArrayList<Point>();
+    	
+    	for(int i = horizontalLinesNum; i < verticesSortedHorizontal.length - horizontalLinesNum; i++) {
+    		verticesSortedHorizontalWithoutEdges.add(verticesSortedHorizontal[i]);
+    	}
+    	for(int i = verticalLinesNum; i < verticesSortedVertical.length - verticalLinesNum; i++) {
+    		verticesSortedVerticalWithoutEdges.add(verticesSortedVertical[i]);
+    	}
+    	
+    	List<Point> innerVertices = new ArrayList<Point>();
+    	for(Point p1 : verticesSortedHorizontalWithoutEdges) {
+    		boolean same = false;
+    		for(Point p2 : verticesSortedVerticalWithoutEdges) {
+    			if (p1 == p2) {
+    				same = true;
+    			}
+    		}
+    		if (same) {
+    			innerVertices.add(p1);
+    		}
+    	}
+    	
+    	for(int i = 0; i < verticalLinesNum; i++) {
+    		List<Point> curVerticalLinePoints = new ArrayList<Point>();
+    		for(int j = i * horizontalLinesNum; j < (i + 1) * horizontalLinesNum; j++) {
+    			curVerticalLinePoints.add(innerVertices.get(j));
+    		}
+    		
+    		curVerticalLinePoints.sort((Point a, Point b) -> {
+        		if (a.y() < b.y())
+        			return -1;
+        		else if (a.y() == b.y())
+        			return 0;
+        		else
+        			return 1;
+        	});
+    		
+    		for(int j = 0; j < horizontalLinesNum; j++) {
+    			points[i][j] = curVerticalLinePoints.get(j);
+    		}
+    	}
+    	
+    	char[][] r = new char[2 * (verticalLinesNum + 1) - 1][2 * (horizontalLinesNum + 1) - 1];
+    	
+    	for(int i = 0; i < r.length; i++) {
+    		for(int j = 0; j < r[0].length; j++) {
+    			if (i == 0 || j == 0 || i == r.length - 1 || j == r[0].length - 1) {
+    				// map edge
+    				r[i][j] = '.';
+    			} else if (i % 2 == 1 && j % 2 == 1) {
+    				// vertex
+    				r[i][j] = '@';
+    			} else if (i % 2 == 0 && j % 2 == 0) {
+    				// space between 4 vertices
+    				r[i][j] = '.';
+    			} else if (i % 2 == 1 && j % 2 == 0) {
+    				// vertical graph edge
+    				if (existsEdge(points[i / 2][(j - 1) / 2], points[i / 2][(j - 1) / 2 + 1])) {
+    					r[i][j] = '.';
+    				} else {
+    					r[i][j] = '@';
+    				}
+    			} else {
+    				// horizontal graph edge
+    				if (existsEdge(points[(i - 1) / 2][j / 2], points[(i - 1) / 2 + 1][j / 2])) {
+    					r[i][j] = '.';
+    				} else {
+    					r[i][j] = '@';
+    				}
+    			}
+    		}
+    	}
+    	
+    	return r;
+    }
+    
+    private boolean existsEdge(Point a, Point b) {
+    	for(var edge : edges) {
+    		if (edge.first == a && edge.second == b) {
+    			return true;
+    		}
+    		if (edge.first == b && edge.second == a) {
+    			return true;
+    		}
+    	}
+    	
+    	return false;
     }
 
     private Point getNearest(Point p, List<Point> l) {

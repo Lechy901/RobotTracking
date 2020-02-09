@@ -27,4 +27,6 @@ public class ProgramArguments {
     public int lineWidth = 0;
     public int robotsNumber = 3;
     public int pointGroupDistance = 10;
+    
+    public String mapExportPath = "mapExport.map";
 }
