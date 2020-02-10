@@ -210,29 +210,26 @@ public class ImageGraph {
     		}
     	}
     	
-    	char[][] r = new char[2 * (verticalLinesNum + 1) - 1][2 * (horizontalLinesNum + 1) - 1];
+    	char[][] r = new char[2 * verticalLinesNum - 1][2 * horizontalLinesNum - 1];
     	
     	for(int i = 0; i < r.length; i++) {
     		for(int j = 0; j < r[0].length; j++) {
-    			if (i == 0 || j == 0 || i == r.length - 1 || j == r[0].length - 1) {
-    				// map edge
-    				r[i][j] = '.';
-    			} else if (i % 2 == 1 && j % 2 == 1) {
-    				// vertex
+    			if (i % 2 == 1 && j % 2 == 1) {
+    				// space between 4 vertices
     				r[i][j] = '@';
     			} else if (i % 2 == 0 && j % 2 == 0) {
-    				// space between 4 vertices
+    				// vertex
     				r[i][j] = '.';
     			} else if (i % 2 == 1 && j % 2 == 0) {
-    				// vertical graph edge
-    				if (existsEdge(points[i / 2][(j - 1) / 2], points[i / 2][(j - 1) / 2 + 1])) {
+    				// horizontal graph edge
+    				if (existsEdge(points[(i - 1) / 2][j / 2], points[(i - 1) / 2 + 1][j / 2])) {
     					r[i][j] = '.';
     				} else {
     					r[i][j] = '@';
     				}
     			} else {
-    				// horizontal graph edge
-    				if (existsEdge(points[(i - 1) / 2][j / 2], points[(i - 1) / 2 + 1][j / 2])) {
+    				// vertical graph edge
+    				if (existsEdge(points[i / 2][(j - 1) / 2], points[i / 2][(j - 1) / 2 + 1])) {
     					r[i][j] = '.';
     				} else {
     					r[i][j] = '@';
